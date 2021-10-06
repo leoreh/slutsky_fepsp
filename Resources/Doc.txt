@@ -1,0 +1,3 @@
+StimProtocol_1x0.5ms@0.06Hz		1 pulse of 500 us every 15 s (io)
+StimProtocol_1x0.5ms@1Hz 		1 pulse of 500 us every 1 s (searching for a signal)
+StimProtocol_3x0.5ms@50Hz_30s 		3 pulses of 500 us at 50 Hz, given every 30 s (stp)
