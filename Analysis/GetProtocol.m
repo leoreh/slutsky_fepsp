@@ -6,7 +6,7 @@ function Protocol = GetProtocol(Protocol)
 %           Option 1: Text scalar - io/stp, to use our default protocols.
 %         To use custom protocols:
 %           Option 2: cell array with 6 elements:
-%               {nstim,frStim,StimLength,ProtocolReapeatRate,TraceRecordingLenght,StimLatency}
+%               {nstim,frStim,StimLength,ProtocolReapeatRate,TraceRecordingLength,StimLatency}
 %               In Order, no name - value.
 %           Option 3: struct, same as output.
 %       
@@ -18,7 +18,7 @@ function Protocol = GetProtocol(Protocol)
 %                   frequency protocols are reproduced in a long recording,
 %                   mesuared from last stimuli given to next trace recording
 %                   start.
-%             TraceRecordingLenght = [mS] %Total Trace lenght, Including StimLatency & StimLength
+%             TraceRecordingLength = [mS] %Total Trace lenght, Including StimLatency & StimLength
 %             StimLatency = [mS] time recorded in the trace before the first stimulos is given 
 %   Output:
 %       Protocol - struct with all fields menthioned above.
@@ -26,7 +26,7 @@ function Protocol = GetProtocol(Protocol)
 %   Examples:
 %       Protocol = GetProtocol('io')
 %           Use default nstim = 1 protocol.
-%       Protocol = GetProtocol({nstim,frStim,StimLength,ProtocolReapeatRate,TraceRecordingLenght,StimLatency})
+%       Protocol = GetProtocol({nstim,frStim,StimLength,ProtocolReapeatRate,TraceRecordingLength,StimLatency})
 %           Validate & Convert to struct
 %       Protocol = GetProtocol(ProtocolStruct)
 %           Validate Protocol fields
@@ -42,8 +42,8 @@ if ischar(Protocol) || isStringScalar(Protocol)
             Protocol.frStim = inf; %[Hz]
             Protocol.StimLength = 500; %[uS]
 %             Protocol.ProtocolReapeatRate = 1/15; %[Hz] %From after Stimuli end
-            %Protocol.TraceRecordingLenght = 150; %[mS] %Total, Including StimLatency & StimLength
-            Protocol.TraceRecordingLenght = 148.47; % Wierd WCP behavior?
+            %Protocol.TraceRecordingLength = 150; %[mS] %Total, Including StimLatency & StimLength
+            Protocol.TraceRecordingLength = 148.47; % Wierd WCP behavior?
             Protocol.StimLatency = 30; %[mS]
         case 'stp'
             Protocol = struct();
@@ -51,7 +51,7 @@ if ischar(Protocol) || isStringScalar(Protocol)
             Protocol.frStim = 50; %[Hz] %From start of stim to start of next one, i.e. disregards stim length
             Protocol.StimLength = 500; %[uS]
 %             Protocol.ProtocolReapeatRate = 1/30; %[Hz]
-            Protocol.TraceRecordingLenght = 200; %[mS]
+            Protocol.TraceRecordingLength = 200; %[mS]
             Protocol.StimLatency = 10; %[mS]
         case 'custom'
             AllPrompets = {'Enter number of stimuli given (numeric posative interger)',...
@@ -64,7 +64,7 @@ if ischar(Protocol) || isStringScalar(Protocol)
             Protocol.nstim = UserInputs(1); %[#]
             Protocol.frStim = UserInputs(2); %[Hz] %From start of stim to start of next one, i.e. disregards stim length
             Protocol.StimLength = UserInputs(3); %[uS]
-            Protocol.TraceRecordingLenght = UserInputs(4); %[mS]
+            Protocol.TraceRecordingLength = UserInputs(4); %[mS]
             Protocol.StimLatency = UserInputs(5); %[mS]
     end
 elseif iscell(Protocol) && numel(Protocol) == 6
@@ -72,19 +72,19 @@ elseif iscell(Protocol) && numel(Protocol) == 6
     Tptcl.frStim = Protocol{2}; %[Hz]
     Tptcl.StimLength = Protocol{3}; %[uS]
 %     Tptcl.ProtocolReapeatRate = Protocol{4}; %[Hz]
-    Tptcl.TraceRecordingLenght = Protocol{5}; %[mS]
+    Tptcl.TraceRecordingLength = Protocol{5}; %[mS]
     Tptcl.StimLatency = Protocol{6}; %[mS]
     Protocol = Tptcl;
 elseif isstruct(Protocol) && isscalar(Protocol)
-    if ~all(isfield(Protocol,{'nstim','frStim','StimLength','TraceRecordingLenght','StimLatency'}))
+    if ~all(isfield(Protocol,{'nstim','frStim','StimLength','TraceRecordingLength','StimLatency'}))
         error(['Protocol must be: char - ''io'' or ''stp'' to use our defaults (see help for info), cell array with 6 elements:'...
-            '{nstim,frStim,StimLength,ProtocolReapeatRate,TraceRecordingLenght,StimLatency}'...
-            ', or struct scalar with {nstim,frStim,StimLength,ProtocolReapeatRate,TraceRecordingLenght,StimLatency} as fields'])
+            '{nstim,frStim,StimLength,ProtocolReapeatRate,TraceRecordingLength,StimLatency}'...
+            ', or struct scalar with {nstim,frStim,StimLength,ProtocolReapeatRate,TraceRecordingLength,StimLatency} as fields'])
     end
 else
     error(['Protocol must be: char - ''io'' or ''stp'' to use our defaults (see help for info), cell array with 6 elements:'...
-            '{nstim,frStim,StimLength,ProtocolReapeatRate,TraceRecordingLenght,StimLatency}'...
-            ', or struct scalar with {nstim,frStim,StimLength,ProtocolReapeatRate,TraceRecordingLenght,StimLatency} as fields'])
+            '{nstim,frStim,StimLength,ProtocolReapeatRate,TraceRecordingLength,StimLatency}'...
+            ', or struct scalar with {nstim,frStim,StimLength,ProtocolReapeatRate,TraceRecordingLength,StimLatency} as fields'])
 end
 
 if mod(Protocol.nstim,1)~=0 || Protocol.nstim<=0 || ~isscalar(Protocol.nstim)
@@ -95,8 +95,8 @@ elseif ~isnumeric(Protocol.StimLength) || ~isscalar(Protocol.StimLength) || Prot
     error('When using custom protocol, <StimLength> must be a positive scalar [uS]')
 % elseif ~isnumeric(Protocol.ProtocolReapeatRate) || ~isscalar(Protocol.ProtocolReapeatRate) || Protocol.ProtocolReapeatRate<=0
 %     error('When using custom protocol, <ProtocolReapeatRate> must be a positive scalar [Hz]')
-elseif ~isnumeric(Protocol.TraceRecordingLenght) || ~isscalar(Protocol.TraceRecordingLenght) || Protocol.TraceRecordingLenght<=0
-    error('When using custom protocol, <TraceRecordingLenght> must be a positive scalar [mS]')
+elseif ~isnumeric(Protocol.TraceRecordingLength) || ~isscalar(Protocol.TraceRecordingLength) || Protocol.TraceRecordingLength<=0
+    error('When using custom protocol, <TraceRecordingLength> must be a positive scalar [mS]')
 elseif ~isnumeric(Protocol.StimLatency) || ~isscalar(Protocol.StimLatency) || Protocol.StimLatency<=0
     error('When using custom protocol, <StimLatency> must be a positive scalar [mS]')
 end

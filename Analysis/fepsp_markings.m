@@ -253,7 +253,7 @@ function marking_win = fepsp_markings(varargin)
 %        max / min, but doable. !!!!Done!!!!
 % Note7: What will happen if traces are not the same length between cells?
 %        Tstamp won't match them. Validate length of each trace match
-%        Tstamps: (TraceRecordingLenght./(1000/fs)) + 1
+%        Tstamps: (TraceRecordingLength./(1000/fs)) + 1
 % Note8: I'm not sure "End of the response" & "Start of the response" is a
 %        good nomenclature. Changed to "Peak" & "Start". Speak about trough
 %        in README.
@@ -380,7 +380,7 @@ for iTraces_group = numel(traces):-1:1
 end
 
 % Create time stamps
-Tstamps = -protocol_info.StimLatency:(1/fs)*1000:(protocol_info.TraceRecordingLenght-protocol_info.StimLatency);
+Tstamps = -protocol_info.StimLatency:(1/fs)*1000:(protocol_info.TraceRecordingLength-protocol_info.StimLatency);
 Tstamps = Tstamps';
 
 % Find the order of intensities
