@@ -1,19 +1,19 @@
 function [traces] = fepsp_org2traces(varargin)
 
-% Organizes contineous data (data_in) into a cell array of traces for
-% downstream analysis. Requires indices of stimulation onset (stim_locs)
-% arranged in a cell array according to intensities. Organization is done
+% organizes contineous data (data_in) into a cell array of traces for
+% downstream analysis. requires indices of stimulation onset (stim_locs)
+% arranged in a cell array according to intensities. organization is done
 % according to a predefined stimulation protocol. 
 % 
 % For more information see https://github.com/leoreh/slutsky_fepsp.
 %
-% INPUT (required)
+% INPUT (required):
 %   data_in     - 2d numeric mat of sample (row) x channel
 %                 (column). Data recorded during the experiment. 
 %   fs          - Numeric scalar. Sampling frequency of the
 %                 recorded data [Hz]. 
-%   protocol_id - String or char. ID of stimulation protocol
-%                 used, e.g. "io","stp" or "custom". See "GetProtocol.m" for
+%   protocol_id - String or char. ID of stimulation protocol.
+%                 e.g. "io","stp" or "custom". See "GetProtocol.m" for
 %                 more info.
 %   stim_locs   - 1d cell array of intensities with each cell
 %                 containing a numeric row vector of stimulus onset indices
@@ -21,7 +21,7 @@ function [traces] = fepsp_org2traces(varargin)
 %                 two stimulations at the 3rd intensity were given at
 %                 sample 5000 and 10000.
 
-% INPUT (optional)
+% INPUT (optional):
 %   base_path -   String or char. Full path to where the output should be
 %                 saved. The name of the last folder in base_path will be
 %                 the prefix for all saved data. e.g. base_path =
@@ -34,14 +34,14 @@ function [traces] = fepsp_org2traces(varargin)
 %                 mat file named "<base_name>_fepsp_traces".
 %                 Default: true
 %
-% OUTPUT
+% OUTPUT:
 %   traces      - 2d cell array of channel (row) x intensity (column) with
 %                 each cell containing a 2d numeric mat of sample (row) x
-%                 repetition (column). This is similar to "Standard Cell"
-%                 (see README), but inside each cell, rows are samples
+%                 repetition (column). This is similar to "standard cell"
+%                 (see README) but inside each cell, rows are samples
 %                 instead of stimulus number.
 %
-% CALL
+% CALL:
 %   traces = fepsp_org2traces("data_in", <numeric mat>, "fs", <numeric
 %   scalar>, "protocol_id", <string scalar>, "stim_locs", <cell vec>,
 %   "base_path", <folder path>, "rmv_med", <logical flag>, "save_var",
