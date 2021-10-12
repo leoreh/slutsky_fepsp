@@ -136,7 +136,7 @@ protocol_info = GetProtocol(protocol_id);
 % stimulus), display (xlimits) and response area (expected response area,
 % for excluding stimulus artifacts).
 % See GetWindowsFromProtocol for more info
-windows_info = GetWindowsFromProtocol(protocol_info,fs,dt,traces_xlim);
+windows_info = GetWindowsFromProtocol(protocol_info, fs, dt, traces_xlim);
 
 % Preallocate Marked Times outputs from GUI - mainly to define their size
 % mark_peaks,mark_starts - 

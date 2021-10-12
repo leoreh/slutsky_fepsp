@@ -85,107 +85,19 @@ function marking_win = fepsp_markings(varargin)
 %   empty>, "traces_ylim", <numeric 2 elements, or empty>, "dt", <numeric
 %   non-negative scalar>, "max_jitter", <numeric non-negative
 %   scalar>, "fast_mark", <logical flag>);
-%
-% Note1: is checking if channel changed for ylimits in PlotANew really
-%        nessasry? For changing channel when on low intens. Sound like
-%        still need to compare to current plot, in case of out of Y axis.
-%        See Note 2. Needed. !!!!Done!!!!
-% Note2: Ylimit deciding method is bad. choose rules for basis, expanding &
-%        shrinking.
-%        Option 1: We always need to check for expanding, relative to
-%                  inherited (existing) ylim. We only need to shrink if we
-%                  inverted or remove, and only to minimal max intn of
-%                  this channel. Problem case: we needed to expand, then
-%                  in lower inten we inverted, as a resualt shrink back to
-%                  smaller than previosly expended.
-%        Option 2: We always first try to expand, then try to shrink back
-%                  to minimal max intn of this channel. similar Problem
-%                  case as option 1, but now not only when inverting.
-%        Option 3: Fix ylim to widest of all this channel traces. Need to
-%                  refit when inverting or removing. Problem: bad trace in
-%                  1 intens will cause problem in all of them, but won't be
-%                  very visiable.
-%        Option 4: Try to expend every time I move traces group, realtive to inherited Ylim.
-%                  Save ylim each time I move traces group (after expanding), then
-%                  when invert/remove try to shrink to those. What to do
-%                  when moving not via next? Same as moving by next,
-%                  expanding / max intens in channel. What to do if we are
-%                  on the max intens in channel? same as always, try to
-%                  shrink to max channel = try to shrink to saved. Solve
-%                  problem from option 1, as I will return to inherited &
-%                  not to max intens. Problems: moving after inverting
-%                  "locks in" the ylimits, pre-inverted trace is
-%                  problematic.
-%        implamented option 2. Working, not ideal, but will do for now.
-%        !!!!Done!!!!
-% Note3: Remove trace renumber traces. This make it hard to find them
-%        later, if needed to re-remove for example. Solution: instead of
-%        totaly removing data, NaN it. Implamented, check it, Mainly effect
-%        on saving & Ylim. !!!!Done!!!
-% Note4: Output as struct is not very comfterbale. Maybe check for every
-%        var, and jump questdlg if overwrite or save as ans? what about
-%        multi ans case? What about calling from function and not cmd? Save
-%        and user can load. !!!!DONE!!!!
-% Note5: Should Ylimit take into accuont baseline as well? problem overflow
-%        to lineROI initial pos & GetWindowsFromProtocol func !!!!Nope!!!!
-% Note6: Itruduce tolerance to start marks. Do not choose maxima/minima for
-%        start / end marking. Options:
-%        1) Search for max value in tolerance windows under absolute - does
-%           not help, everything may be posative / negative. 
-%        2) Calculate prominences for the whole anaylse window, both normal
-%           & inverted. Take the peak with maximal prominance (from both
-%           cases), and try to get the point closest to it in tolerance
-%           window.Problem - noisy data, some peaks my have lower
-%           prominance then they should as they are "riding" other extrima.
-%        3) For each extrima in 1 response, find absolote distance from
-%           mean baseline. Find the point with the maximum distance. Take
-%           the point closest to it in tolerance window.
-%        4) For each point in tolerance window, find absolote distance from
-%           mean baseline. Find the point with the maximum distance.
-%           Seriosly, how didn't I think about this ages ago?!
-%        Implamented (4). Check goodness of fit. fit a littel worst the
-%        max / min, but doable. !!!!Done!!!!
-% Note7: What will happen if traces are not the same length between cells?
-%        Tstamp won't match them. Validate length of each trace match
-%        Tstamps: (TraceRecordingLength./(1000/fs)) + 1
-% Note8: I'm not sure "End of the response" & "Start of the response" is a
-%        good nomenclature. Changed to "Peak" & "Start". Speak about trough
-%        in README.
-% Note9: Merge AVG markings into all data, as end+1 trace, at least for
-%        output. Pro: reduce number of inputs to each function. Con: Make
-%        calculation on anything more confusing to user (always remember to
-%        remove last trace). !!!!Nope!!!!
-% Note10: Should we prevent points to be outside of AnalyseWin? YES,
-%         !!!!Done!!!!
-% Note11: Weird results case: Saving traces group markers, then returning
-%         to it. Removing or inverting trace does change mean trace, but do
-%         not currect marking for it. Add warning to "save markings"
-%         prompt? Or is it clear that you need to save when you make a
-%         change?
-% Note12: Give option for tolarance method - far from baseline, start-min
-%         peak-max, start-max peak-min. Do it by seperating Start & Peak
-%         refernce baseline - mean baseline for far from baseline, max
-%         trace value for min & min trace value for max. Always search for
-%         the absolute diffrence between points in tolarance & baseline.
-% Note13: Fix start_tol_window is empty due to too big dt. Prevent lines
-%         getting outside analysis window?
-% Note14: assuming start is on the edge of the responce - close to the
-%         baseline. It'll always try to run away?
 
-%% Input Parser - Define & validate All Inputs
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% input
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Give Option to enter inputs via struct, instead of name-value
 p = inputParser;
 p.StructExpand = true;
 p.KeepUnmatched = true;
 
-% Data arguments
 p.addParameter('traces',[],@(x) validateattributes(x,{'cell'},{'2d'}))
 p.addParameter('fs',[],@(x) validateattributes(x,{'numeric'},{'scalar'}))
 p.addParameter('protocol_id',[],@(x) validateattributes(x,{'string','char'},{'scalartext'}))
 p.addParameter('intens',[],@(x) validateattributes(x,{'numeric'},{'vector'}))
-
-% Function management arguments
 p.addParameter('base_path',pwd,@isfolder)
 p.addParameter('traces_xlim',[],@(x) isnumeric(x) && (numel(x)==2 || isempty(x)))
 p.addParameter('traces_ylim',[],@(x) isnumeric(x) && (numel(x)==2 || isempty(x)))
@@ -195,56 +107,27 @@ p.addParameter('fast_mark',false,@(x) validateattributes(x,{'logical','numeric'}
 
 p.parse(varargin{:})
 
-% Data inputs
-traces        = p.Results.traces;
-fs            = p.Results.fs;
-protocol_id   = p.Results.protocol_id;
-intens        = p.Results.intens;
+traces          = p.Results.traces;
+fs              = p.Results.fs;
+protocol_id     = p.Results.protocol_id;
+intens          = p.Results.intens;
+base_path       = p.Results.base_path;
+traces_xlim     = sort(p.Results.traces_xlim);
+traces_ylim     = sort(p.Results.traces_ylim);
+dt              = p.Results.dt;
+max_jitter      = p.Results.max_jitter;
+fast_mark       = logical(p.Results.fast_mark);
 
-% Function management arguments
-base_path   = p.Results.base_path;
-traces_xlim = sort(p.Results.traces_xlim);
-traces_ylim = sort(p.Results.traces_ylim);
-dt            = p.Results.dt;
-max_jitter  = p.Results.max_jitter;
-fast_mark     = logical(p.Results.fast_mark);
-
-% Make sure all required inputs were given
-req_inputs = {'traces','fs','protocol_id'};
-req_logIND = ismember(req_inputs,p.UsingDefaults);
-if any(req_logIND)
-    % If there are missing inputs, try to load them from '_fepsp_traces'
-    [~,base_name] = fileparts(base_path);
-    traces_file = [base_path filesep base_name '_fepsp_traces.mat'];
-    if exist(traces_file, 'file')
-        % File exist. Notify user about the loading, and load by varnames.
-        % If any variable needed to be loaded is missing, error instead of warning.
-        fprintf('Loading missing required input/s {%s} from found file "%s"\n',sprintf('%s, ',req_inputs{req_logIND}),traces_file)
-        
-        warning('error','MATLAB:load:variableNotFound')
-        load(traces_file,req_inputs{req_logIND})
-        warning('on','MATLAB:load:variableNotFound')
-        
-        % Validate loaded variables, the same way as when given as inputs.
-        % Any variable given as input will pass this check, as it has passed already.
-        validateattributes(traces,{'cell'},{'2d'},'fepsp_markings','traces')
-        validateattributes(fs,{'numeric'},{'scalar'},'fepsp_markings','fs')
-        validateattributes(protocol_id,{'string','char'},{'scalartext'},'fepsp_markings','protocol_id')
-    else
-        error(['Missing required input/s {%s}. Was unable to find file "%s" to load them from.',...
-            ' Inputs {''traces'',''fs'',''protocol_id''} are required.'],sprintf('%s, ',req_inputs{req_logIND}),traces_file)
-    end
-end
-
-
-% Validate intens
+% validate intens
 if isempty(intens)
-    % If intens were not given, create mock intens in the negative domain
-    intens = -(size(traces,2):-1:1);
-elseif numel(intens) ~= size(traces,2)
-    error('Number of inten does not match number of intensities in traces (number of columns in the cell array)')
+    intens = -(size(traces, 2) : -1 : 1);
+elseif numel(intens) ~= size(traces, 2)
+    error('number of intensities does not fit size of traces')
 end
-%% Crete helper variables
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% helper vars
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Get protocol struct info from protocol_id
 protocol_info = GetProtocol(protocol_id);
@@ -253,15 +136,13 @@ protocol_info = GetProtocol(protocol_id);
 % stimulus), display (xlimits) and response area (expected response area,
 % for excluding stimulus artifacts).
 % See GetWindowsFromProtocol for more info
-windows_info = GetWindowsFromProtocol(protocol_info,fs,dt,traces_xlim);
+windows_info = GetWindowsFromProtocol(protocol_info, fs, dt, traces_xlim);
 
-% Preallocate Marked Times outputs from GUI - mainly to define their size
-% mark_peaks,mark_starts - 
-% cell array channel-by-intensity, inside double stim-by-trace
-[mark_peaks,mark_starts] = deal(cellfun(@(x) nan(protocol_info.nstim,size(x,2)),traces,'UniformOutput',0));
-% mark_peaks_avg,mark_starts_avg - 
-% cell array channel-by-intensity, inside double stim (rows) col vec
-[mark_peaks_avg,mark_starts_avg] = deal(repmat({nan(protocol_info.nstim,1)},size(traces)));
+% initilialize cell arrays of markings
+[mark_peaks, mark_starts] =...
+    deal(cellfun(@(x) nan(protocol_info.nstim, size(x, 2)), traces, 'UniformOutput', 0));
+[mark_peaks_avg, mark_starts_avg] =...
+    deal(repmat({nan(protocol_info.nstim, 1)}, size(traces)));
 
 % Convert max_jitter to max index difference from selected time point -
 % half in each direction
@@ -279,7 +160,11 @@ Tstamps = Tstamps';
 
 % Find the order of intensities
 [intens_sorted,intens_order] = sort(intens,'ascend');
-%% Build GUI
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% build gui
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 marking_win = figure();
 marking_win.Name = 'fepsp Marking GUI';
 
@@ -384,7 +269,9 @@ traces_plot(end).DataTipTemplate.DataTipRows(end+1) = dataTipTextRow('AvgTrace',
 marking_win.CloseRequestFcn = @(~,~) close_GUI(marking_win,Lis); % Export marks on window close
 marking_win.KeyReleaseFcn =  @(~,evt) next_on_enter(evt,marking_win,Ch_button,intens_button); % Create move trace by pressing "enter"/"return"
 
-%% Save data to transfer between callbacks
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% save between callbacks
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Save all data related to the fepsp under 1 struct, to keep it organized
 fepsp_data.traces               = traces;
@@ -414,7 +301,10 @@ marking_win.UserData.traces_ylim                  = traces_ylim;
 marking_win.UserData.base_path                    = base_path;
 end
 
-%% Helper Functions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% helper functions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 function save_markings(marking_win,Ch_button_val,intens_button_val)
 % Saving the current markings according to channel & intensity values.
 % Before saving, finds the best match within tolerance for each trace.
