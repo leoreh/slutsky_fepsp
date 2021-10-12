@@ -129,22 +129,15 @@ end
 % helper vars
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Get protocol struct info from protocol_id
+% get stim protocol info and windows
 protocol_info = GetProtocol(protocol_id);
-
-% Windows mark important area in the trace - baseline (before first
-% stimulus), display (xlimits) and response area (expected response area,
-% for excluding stimulus artifacts).
-% See GetWindowsFromProtocol for more info
 windows_info = GetWindowsFromProtocol(protocol_info, fs, dt, traces_xlim);
 
-% Preallocate Marked Times outputs from GUI - mainly to define their size
-% mark_peaks,mark_starts - 
-% cell array channel-by-intensity, inside double stim-by-trace
-[mark_peaks,mark_starts] = deal(cellfun(@(x) nan(protocol_info.nstim, size(x, 2)), traces, 'UniformOutput', 0));
-% mark_peaks_avg,mark_starts_avg - 
-% cell array channel-by-intensity, inside double stim (rows) col vec
-[mark_peaks_avg,mark_starts_avg] = deal(repmat({nan(protocol_info.nstim,1)},size(traces)));
+% initilialize cell arrays of markings
+[mark_peaks, mark_starts] =...
+    deal(cellfun(@(x) nan(protocol_info.nstim, size(x, 2)), traces, 'UniformOutput', 0));
+[mark_peaks_avg, mark_starts_avg] =...
+    deal(repmat({nan(protocol_info.nstim, 1)}, size(traces)));
 
 % Convert max_jitter to max index difference from selected time point -
 % half in each direction
