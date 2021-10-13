@@ -1,5 +1,10 @@
 
 % prep
+basepath = 'D:\Data\fepsp_test\lh85_211012_113400';
+[~, basename] = fileparts(basepath);
+cd(basepath)
+load('lh85_catted.mat')
+
 protocol_id = 'io';
 intens = IntensIO;
 data_in = CattedfepspIO;
@@ -10,11 +15,8 @@ intens = IntensSTP;
 data_in = CattedfepspSTP;
 stimIdx = StimIndexSTP;
 
-basepath = 'D:\Data\fepsp_test\lh85_211012_113400';
-[~, basename] = fileparts(basepath);
-cd(basepath)
 
-% load('lh85_catted.mat')
+
 
 % figure
 stimN = 2;

@@ -28,23 +28,23 @@ function [traces] = fepsp_org2traces(varargin)
 %                 'lh85_211012_132000' than the output of fepsp_org2traces
 %                 will be lh85_211012_132000_fepsp_traces'.
 %                 Default: pwd.
-%   rmv_med     - Logical flag. Remove median from data_in.
+%   rmv_trend     - Logical flag. Remove median from data_in.
 %                 Default: true
 %   save_var    - Logical flag. Save output in base_path as
 %                 mat file named "<base_name>_fepsp_traces".
 %                 Default: true
 %
-% OUTPUT
+% OUTPUT:
 %   traces      - 2d cell array of channel (row) x intensity (column) with
 %                 each cell containing a 2d numeric mat of sample (row) x
-%                 repetition (column). This is similar to "standard Cell"
-%                 (see README), but inside each cell, rows are samples
+%                 repetition (column). This is similar to "standard cell"
+%                 (see README) but inside each cell, rows are samples
 %                 instead of stimulus number.
 %
-% CALL
+% CALL:
 %   traces = fepsp_org2traces("data_in", <numeric mat>, "fs", <numeric
 %   scalar>, "protocol_id", <string scalar>, "stim_locs", <cell vec>,
-%   "base_path", <folder path>, "rmv_med", <logical flag>, "save_var",
+%   "base_path", <folder path>, "rmv_trend", <logical flag>, "save_var",
 %   <logical flag>);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -59,7 +59,7 @@ p.addParameter('fs',            [],     @(x) validateattributes(x, {'numeric'}, 
 p.addParameter('protocol_id',   '',     @(x) validateattributes(x, {'string', 'char'}, {'scalartext'}))
 p.addParameter('stim_locs',     [],     @(x) validateattributes(x, {'cell'}, {'vector'}))
 p.addParameter('base_path',     pwd,    @isfolder)
-p.addParameter('rmv_med',       true,   @(x) validateattributes(x, {'logical','numeric'}, {'binary','scalar'}))
+p.addParameter('rmv_trend',     true,   @(x) validateattributes(x, {'logical','numeric'}, {'binary','scalar'}))
 p.addParameter('save_var',      true,   @(x) validateattributes(x, {'logical','numeric'}, {'binary','scalar'}))
 p.parse(varargin{:})
 
@@ -67,7 +67,7 @@ data_in         =   p.Results.data_in;
 fs              =   p.Results.fs;
 protocol_id     =   p.Results.protocol_id;
 stim_locs       =   p.Results.stim_locs;
-rmv_med         =   logical(p.Results.rmv_med);
+rmv_trend       =   logical(p.Results.rmv_trend);
 base_path       =   p.Results.base_path;
 save_var        =   p.Results.save_var;
 
@@ -80,11 +80,6 @@ nCh = size(data_in, 2);
 nSamp = size(data_in, 1);
 nIntens = size(stim_locs, 2);
 nStim = cellfun(@numel, stim_locs);
-
-% remove median
-if rmv_med
-    data_in = rmDC(data_in, 'dim', 1, 'DCmod', 'median');
-end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % slice recording according to stim indices
@@ -117,7 +112,7 @@ catch err
     
     err_msg = '';
     if any(overflow)
-        over_msg = sprintf(' Stimulus locations {%s} in corresponding intensities cells {%s} produce traces that end after recording finished.',...
+        over_msg = sprintf(' trace {%s} in intensity {%s} produce traces that end after recording finished.',...
             sprintf('%d,', stim_locs_cat(overflow)), sprintf('%d,', intens_overflow));
         err_msg = [err_msg over_msg];
     end
@@ -130,20 +125,51 @@ catch err
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% organize in cell and save
+% organize in cell
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % create cell array
 traces = mat2cell(traces_mat, nStim * length(trace_temp), ones(nCh, 1))';
 
-% reshape each cell
+% reshape each cell 
 for iIntens = 1 : nIntens
     for iCh = 1 : nCh
         traces{iCh, iIntens} = reshape(traces{iCh, iIntens}, length(trace_temp), []);
     end
 end
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% detrend
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+if rmv_trend
+    % build regressor to find the trend of a trace using the first and last 5
+    % ms. This is to exclude the evoked response and stimulus artifact from the
+    % linear fit. based on matrix form of polynomial regression.
+    lip = 5 * fs / 1000;
+    reg_len = 2 * lip;
+    trace_len = length(trace_temp);
+    
+    use_idx = [1 : lip, trace_len : -1 : trace_len - lip + 1];
+    w = [0 : reg_len - 1] / (reg_len - 1);
+    w = [reshape(w, reg_len, []), ones(reg_len, 1)];
+    [q, r] = qr(w, 0);
+    w_full = [0 : trace_len - 1] / (trace_len - 1);
+    w_full = [reshape(w_full, trace_len, []), ones(trace_len, 1)];
+    
+    for iIntens = 1 : nIntens
+        for iCh = 1 : nCh
+            trend_coeff = (r \ q' * traces{iCh, iIntens}(use_idx, :));
+            trend{iCh, iIntens} = w_full * trend_coeff;
+            x{iCh, iIntens} = traces{iCh, iIntens} - trend{iCh, iIntens};
+        end
+    end
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % save
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 if save_var
     [~, base_name] = fileparts(base_path);
     traces_file = fullfile(base_path, [base_name '_fepsp_traces.mat']);
