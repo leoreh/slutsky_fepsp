@@ -22,13 +22,13 @@ function [traces] = fepsp_org2traces(varargin)
 %                 sample 5000 and 10000.
 
 % INPUT (optional):
-%   base_path -   String or char. Full path to where the output should be
+%   base_path   - String or char. Full path to where the output should be
 %                 saved. The name of the last folder in base_path will be
 %                 the prefix for all saved data. e.g. base_path =
 %                 'lh85_211012_132000' than the output of fepsp_org2traces
 %                 will be lh85_211012_132000_fepsp_traces'.
 %                 Default: pwd.
-%   rmv_trend     - Logical flag. Remove median from data_in.
+%   rmv_trend   - Logical flag. Remove median from data_in.
 %                 Default: true
 %   save_var    - Logical flag. Save output in base_path as
 %                 mat file named "<base_name>_fepsp_traces".
