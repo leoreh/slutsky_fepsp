@@ -1,84 +1,14 @@
 {
-    "fEPSP_GUI_SA":
-    {
-        "inputs":
-        [
-            {"name":"traces", "kind":"namevalue", "type":[["cell", "2d"]]},
-            {"name":"fs", "kind":"namevalue", "type":[["numeric", "scalar"]]},
-            {"name":"Protocol", "kind":"namevalue", "type":[["choices={'io','stp','custom'}"],["cell","numel=6"],["struct", "scalar"]]},
-            {"name":"intens", "kind":"namevalue", "type":[["numeric", "vector"]]},
-            {"name":"dt", "kind":"namevalue", "type":[["numeric", "scalar"]]},
-            {"name":"DispWindow", "kind":"namevalue", "type":[["numeric", "numel=2"]]},
-            {"name":"MinTimeTol", "kind":"namevalue", "type":[["numeric", "scalar"]]}
-        ]
-    },
-    "CutIntoTraces":
-    {
-        "inputs":
-        [
-            {"name":"DataSamples", "kind":"namevalue", "type":[["cell", "2d"],["numeric", "2d"]]},
-            {"name":"fs", "kind":"namevalue", "type":[["numeric", "scalar"]]},
-            {"name":"Protocol", "kind":"namevalue", "type":[["choices={'io','stp','custom'}"],["cell","numel=6"],["struct", "scalar"]]},
-            {"name":"StimTimes", "kind":"namevalue", "type":[["cell", "2d"]]},
-            {"name":"OrigTstamps", "kind":"namevalue", "type":[["cell", "2d"],["numeric", "2d"]]},
-            {"name":"StimTimes_AsIND", "kind":"namevalue", "type":[["logical"],["choices={0, 1}"]]},
-            {"name":"TimeTolerance", "kind":"namevalue", "type":[["numeric", "scalar"]]},
-            {"name":"RemoveDC", "kind":"namevalue", "type":[["logical"],["choices={0, 1}"]]},
-            {"name":"LowPassCutOffFrq", "kind":"namevalue", "type":[["numeric", "scalar"]]}
-        ]
-    },
-    "FEPSP_AnalyseSA":
-    {
-        "inputs":
-        [
-            {"name":"traces", "kind":"namevalue", "type":[["cell", "2d"]]},
-            {"name":"fs", "kind":"namevalue", "type":[["numeric", "scalar"]]},
-            {"name":"Protocol", "kind":"namevalue", "type":[["choices={'io','stp','custom'}"],["cell","numel=6"],["struct", "scalar"]]},
-            {"name":"MarkedTimes_Starts", "kind":"namevalue", "type":[["cell", "2d"]]},
-            {"name":"MarkedTimes_Ends", "kind":"namevalue", "type":[["cell", "2d"]]},
-            {"name":"MarkedTimesStarts_AvgTrace", "kind":"namevalue", "type":[["numeric", "3d"]]},
-            {"name":"MarkedTimesEnds_AvgTrace", "kind":"namevalue", "type":[["numeric", "3d"]]}
-        ]
-    },
-    "FEPSP_ShowAnalysed":
-    {
-        "inputs":
-        [
-            {"name":"fepsp", "kind":"namevalue", "type":[["struct", "scalar"]]},
-            {"name":"SavePath", "kind":"namevalue", "type":["folder"]},
-            {"name":"Savename", "kind":"namevalue", "type":["string"]}
-        ]
-    },
-    "FEPSP_ShowAnalysed":
-    {
-        "inputs":
-        [
-            {"name":"y", "kind":"namevalue", "type":[["cell", "2d"],["numeric", "2d"]]},
-            {"name":"fs", "kind":"namevalue", "type":[["numeric", "scalar"]]},
-            {"name":"Protocol", "kind":"namevalue", "type":[["string"],["cell","numel=6"],["struct", "scalar"]]},
-            {"name":"StimTimes", "kind":"namevalue", "type":[["cell", "2d"],["numeric", "2d"]]},
-            {"name":"intens", "kind":"namevalue", "type":[["numeric", "vector"]]},
-            {"name":"OrigTstamps", "kind":"namevalue", "type":[["cell", "2d"],["numeric", "2d"]]},
-            {"name":"StimTimesAsIND_Flag", "kind":"namevalue", "type":[["logical"],["choices={0, 1}"]]},
-            {"name":"dt", "kind":"namevalue", "type":[["numeric", "scalar"]]},
-            {"name":"DispWindow", "kind":"namevalue", "type":[["numeric", "numel=2"]]},
-            {"name":"MarkedTimesEndsTraces", "kind":"namevalue", "type":[["cell", "2d"]]},
-            {"name":"MarkedTimesStartsTraces", "kind":"namevalue", "type":[["numeric", "3d"]]},
-            {"name":"MarkedTimesEndsAVG", "kind":"namevalue", "type":[["numeric", "3d"]]},
-            {"name":"SavePath", "kind":"namevalue", "type":["folder"]},
-            {"name":"Savename", "kind":"namevalue", "type":["string"]}
-        ]
-    },
     "fepsp_org2traces":
     {
         "inputs":
         [
-            {"name":"data_samples", "kind":"namevalue", "type":[["numeric", "2d"]]},
+            {"name":"data_in", "kind":"namevalue", "type":[["numeric", "2d"]]},
             {"name":"fs", "kind":"namevalue", "type":[["numeric", "scalar"]]},
-            {"name":"protocol_id", "kind":"namevalue", "type":[["string"],["choices={'io','stp','custom'}"]]},
+            {"name":"protocol_id", "kind":"namevalue", "type":[["choices=['custom',get_protocol('protocol_id','display')]"]]},
             {"name":"stim_locs", "kind":"namevalue", "type":[["cell", "vector"]]},
             {"name":"base_folder", "kind":"namevalue", "type":["folder"]},
-            {"name":"remove_DC", "kind":"namevalue", "type":[["logical"],["choices={0, 1}"]]},
+            {"name":"rmv_trend", "kind":"namevalue", "type":[["logical"],["choices={0, 1}"]]},
             {"name":"save_var", "kind":"namevalue", "type":[["logical"],["choices={0, 1}"]]}
         ]
     },
@@ -88,12 +18,12 @@
         [
             {"name":"traces", "kind":"namevalue", "type":[["cell", "2d"]]},
             {"name":"fs", "kind":"namevalue", "type":[["numeric", "scalar"]]},
-            {"name":"protocol_id", "kind":"namevalue", "type":[["string"],["choices={'io','stp','custom'}"]]},
+            {"name":"protocol_id", "kind":"namevalue", "type":[["choices=['custom',get_protocol('protocol_id','display')]"]]},
             {"name":"intens", "kind":"namevalue", "type":[["numeric", "vector"]]},
             {"name":"traces_Xlimit", "kind":"namevalue", "type":[["numeric", "numel=2"],["@(x) isempty(x)"]]},
             {"name":"traces_Ylimit", "kind":"namevalue", "type":[["numeric", "numel=2"],["@(x) isempty(x)"]]},
             {"name":"dt", "kind":"namevalue", "type":[["numeric", "scalar"]]},
-            {"name":"max_time_tol", "kind":"namevalue", "type":[["numeric", "scalar", ">=0"]]},
+            {"name":"max_jitter", "kind":"namevalue", "type":[["numeric", "scalar", ">=0"]]},
             {"name":"base_folder", "kind":"namevalue", "type":["folder"]},
             {"name":"fast_mark", "kind":"namevalue", "type":[["logical"],["choices={0, 1}"]]}
         ]
@@ -104,13 +34,10 @@
         [
             {"name":"traces", "kind":"namevalue", "type":[["cell", "2d"]]},
             {"name":"fs", "kind":"namevalue", "type":[["numeric", "scalar"]]},
-            {"name":"protocol_id", "kind":"namevalue", "type":[["string"],["choices={'io','stp','custom'}"]]},
-            {"name":"marked_starts", "kind":"namevalue", "type":[["cell", "2d"]]},
-            {"name":"marked_peaks", "kind":"namevalue", "type":[["cell", "2d"]]},
-            {"name":"Avg_marked_starts", "kind":"namevalue", "type":[["cell", "2d"]]},
-            {"name":"Avg_marked_peaks", "kind":"namevalue", "type":[["cell", "2d"]]},
+            {"name":"protocol_id", "kind":"namevalue", "type":[["choices=['custom',get_protocol('protocol_id','display')]"]]},
+            {"name":"markings", "kind":"namevalue", "type":[["struct", "scalar"]]},
             {"name":"slope_area", "kind":"namevalue", "type":[["numeric", "numel=2", ">=0","<=1"]]},
-            {"name":"base_folder", "kind":"namevalue", "type":["folder"]},
+            {"name":"base_path", "kind":"namevalue", "type":["folder"]},
             {"name":"save_var", "kind":"namevalue", "type":[["logical"],["choices={0, 1}"]]}
         ]
     },
@@ -120,15 +47,37 @@
         [
             {"name":"traces", "kind":"namevalue", "type":[["cell", "2d"]]},
             {"name":"fs", "kind":"namevalue", "type":[["numeric", "scalar"]]},
-            {"name":"protocol_id", "kind":"namevalue", "type":[["string"],["choices={'io','stp','custom'}"]]},
+            {"name":"protocol_id", "kind":"namevalue", "type":[["choices=['custom',get_protocol('protocol_id','display')]"]]},
+            {"name":"markings", "kind":"namevalue", "type":[["struct", "scalar"]]},
+            {"name":"results", "kind":"namevalue", "type":[["struct", "scalar"]]},
             {"name":"intens", "kind":"namevalue", "type":[["numeric", "vector"]]},
-            {"name":"Avg_marked_starts", "kind":"namevalue", "type":[["cell", "2d"]]},
-            {"name":"Avg_marked_peaks", "kind":"namevalue", "type":[["cell", "2d"]]},
-            {"name":"Results", "kind":"namevalue", "type":[["struct", "scalar"]]},
             {"name":"traces_Xlimit", "kind":"namevalue", "type":[["numeric", "numel=2"],["@(x) isempty(x)"]]},
             {"name":"traces_Ylimit", "kind":"namevalue", "type":[["numeric", "numel=2"],["@(x) isempty(x)"]]},
-            {"name":"dt", "kind":"namevalue", "type":[["numeric", "scalar"]]},
-            {"name":"base_folder", "kind":"namevalue", "type":["folder"]}
+            {"name":"dt", "kind":"namevalue", "type":[["numeric", "scalar"]]}
+        ]
+    },
+    "get_protocol":
+    {
+        "inputs":
+        [
+            {"name":"protocol_id", "kind":"namevalue", "type":[["choices=['display','custom',get_protocol('protocol_id','display')]"]]},
+            {"name":"fs", "kind":"namevalue", "type":[["numeric", "scalar"]]},
+            {"name":"dt", "kind":"namevalue", "type":[["numeric", "scalar"]]}
+        ]
+    },
+    "fepsp_plot_markings":
+    {
+        "inputs":
+        [
+            {"name":"traces", "kind":"namevalue", "type":[["cell", "2d"]]},
+            {"name":"fs", "kind":"namevalue", "type":[["numeric", "scalar"]]},
+            {"name":"protocol_id", "kind":"namevalue", "type":[["choices=['custom',get_protocol('protocol_id','display')]"]]},
+            {"name":"markings", "kind":"namevalue", "type":[["struct", "scalar"]]},
+            {"name":"results", "kind":"namevalue", "type":[["struct", "scalar"]]},
+            {"name":"intens", "kind":"namevalue", "type":[["numeric", "vector"]]},
+            {"name":"traces_Xlimit", "kind":"namevalue", "type":[["numeric", "numel=2"],["@(x) isempty(x)"]]},
+            {"name":"traces_Ylimit", "kind":"namevalue", "type":[["numeric", "numel=2"],["@(x) isempty(x)"]]},
+            {"name":"dt", "kind":"namevalue", "type":[["numeric", "scalar"]]}
         ]
     }
 }

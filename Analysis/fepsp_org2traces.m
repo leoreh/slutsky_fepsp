@@ -1,8 +1,8 @@
 function [traces] = fepsp_org2traces(varargin)
 
-% organizes contineous data (data_in) into a cell array of traces for
-% downstream analysis. requires indices of stimulation onset (stim_locs)
-% arranged in a cell array according to intensities. organization is done
+% organizes continuous data (data_in) into a cell array of traces for
+% downstream analysis. Requires indices of stimulation onset (stim_locs)
+% arranged in a cell array according to intensities. Organization is done
 % according to a predefined stimulation protocol. 
 % 
 % For more information see https://github.com/leoreh/slutsky_fepsp.
@@ -10,10 +10,10 @@ function [traces] = fepsp_org2traces(varargin)
 % INPUT (required):
 %   data_in     - 2d numeric mat of sample (row) x channel
 %                 (column). Data recorded during the experiment. 
-%   fs          - Numeric scalar. Sampling frequency of the
+%   fs          - numeric scalar. Sampling frequency of the
 %                 recorded data [Hz]. 
-%   protocol_id - String or char. ID of stimulation protocol.
-%                 e.g. "io","stp" or "custom". See "GetProtocol.m" for
+%   protocol_id - string or char. ID of stimulation protocol.
+%                 e.g. "io","stp" or "custom". See "get_protocol.m" for
 %                 more info.
 %   stim_locs   - 1d cell array of intensities with each cell
 %                 containing a numeric row vector of stimulus onset indices
@@ -22,15 +22,15 @@ function [traces] = fepsp_org2traces(varargin)
 %                 sample 5000 and 10000.
 
 % INPUT (optional):
-%   base_path   - String or char. Full path to where the output should be
+%   base_path   - string or char. Full path to where the output should be
 %                 saved. The name of the last folder in base_path will be
 %                 the prefix for all saved data. e.g. base_path =
 %                 'lh85_211012_132000' than the output of fepsp_org2traces
-%                 will be lh85_211012_132000_fepsp_traces'.
+%                 will be 'lh85_211012_132000_fepsp_traces'.
 %                 Default: pwd.
-%   rmv_trend   - Logical flag. Remove median from data_in.
+%   rmv_trend   - logical flag. Remove median from data_in.
 %                 Default: true
-%   save_var    - Logical flag. Save output in base_path as
+%   save_var    - logical flag. Save output in base_path as
 %                 mat file named "<base_name>_fepsp_traces".
 %                 Default: true
 %
@@ -50,6 +50,7 @@ function [traces] = fepsp_org2traces(varargin)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % input
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 p = inputParser;
 p.StructExpand = true;
 p.KeepUnmatched = true;
@@ -86,10 +87,8 @@ nStim = cellfun(@numel, stim_locs);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % create single trace template in samples according to protocol
-protocol_info = GetProtocol(protocol_id);
-first_sample = -floor(protocol_info.StimLatency .* fs / 1000);
-last_sample = floor(protocol_info.TraceRecordingLength .* fs / 1000) + first_sample;
-trace_temp = first_sample : 1 : last_sample;
+protocol_info = get_protocol("protocol_id",protocol_id,"fs",fs);
+trace_temp = floor(protocol_info.Tstamps*fs/1000)';
 
 % snip traces from data by creating a mat of indices 
 traces_matIdx = trace_temp' + [stim_locs{:}];
@@ -105,7 +104,7 @@ catch err
         rethrow(err)
     end
     
-    % find problamatic intensities
+    % find problematic intensities
     nStim_culm = cumsum(nStim);
     [~, intens_overflow] = max(nStim_culm' ./ find(overflow) >= 1, [], 1);
     [~, intens_underflow] = max(nStim_culm' ./ find(underflow) >= 1, [], 1);
@@ -145,7 +144,7 @@ end
 if rmv_trend
     % build regressor to find the trend of a trace using the first and last 5
     % ms. This is to exclude the evoked response and stimulus artifact from the
-    % linear fit. based on matrix form of polynomial regression.
+    % linear fit. Based on matrix form of polynomial regression.
     lip = 5 * fs / 1000;
     reg_len = 2 * lip;
     trace_len = length(trace_temp);
