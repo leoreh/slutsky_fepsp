@@ -16,15 +16,15 @@ Image Processing Toolbox™, Signal Processing Toolbox™, Statistics and Machin
 The package contains all the functions needed to load, pre-process, process & visualize your data. Each of them accepts low level data, enabling you to switch any of them with your own functions - as long as they produce the same data shape & type.<br>
 🟨🟩🟦 We encourage you to use MATLAB's Tab Autocompletion! Each function parameters should appear when you do so.🟨🟩🟦<br>
 ### Graphical Process Explanation:
-![Load -> [data_in,fs,protocol_id,stim_locs] -> fepsp_org2traces -> [traces] -> fepsp_markings -> [Saved in file: markings, traces (edited)] -> fepsp_analyse ->[results] -> fepsp_show](https://user-images.githubusercontent.com/58705788/136899691-8dea76cf-8b43-4d59-bd65-beaac869d46c.png)<br>
+![Load -> [data_in,fs,protocol_id,stim_locs] -> fepsp_org2traces -> [traces] -> fepsp_markings -> [Saved in file: markings, traces (edited)] -> fepsp_analyse ->[results] -> fepsp_show](https://user-images.githubusercontent.com/58705788/138953388-08da4358-5c0b-469e-92c0-537449316450.png)<br>
 ### Textual Process Explanation:
 ***Load*** - Load the data from Open Ephys or WinWCP.<br>
 ***fepsp_org2traces*** - Take a raw channel data, extract only the stimulus protocol repetitions, and organize everything in a way the package expect.<br>
 ***fepsp_markings*** - Open a GUI to ask user to mark start & peak of each response, for later analysis. Usually marking trough & peak is expected in electrophysiological recordings. Marking example:<br>
-![fepsp_marking example](https://user-images.githubusercontent.com/58705788/136905236-0ca150f8-eeca-4a9f-bbab-4f13ddc35646.png)<br>
+![fepsp_marking example](https://user-images.githubusercontent.com/58705788/138953728-b671ceb7-752d-4e0d-ae25-3b567b3e0f82.png)<br>
 ***fepsp_analyse*** - Calculate slope & amplitude for each marked response.<br>
 ***fepsp_show*** - Show summary of the fepsp data - including average traces, I/O graph (for single stimulus protocol) & facilitation graph (for multi stimulus protocol).Graphs examples:<br>
-![fepsp_show examples](https://user-images.githubusercontent.com/58705788/136914149-14b1ff51-e1b0-4611-bc46-d55e89074e1b.png)<br>
+![fepsp_show examples](https://user-images.githubusercontent.com/58705788/138953666-f1da9818-abe7-4d89-b1cc-ffcbef628b4d.png)<br>
 And helper functions: <br>
 * fepsp_plot_markings – show the marked points & the slope measured area for each trace.
 * get_protocol – load existing saved protocol by ID. <br>
