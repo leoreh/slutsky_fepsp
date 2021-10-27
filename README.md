@@ -37,6 +37,7 @@ format accepted by Take a raw channel data, extract only the stimulus protocol r
 #### Notes
 - The pipeline assumes each recording is in its own directory and that name of that directory will be used for all saved files. For example, if the recording is in a directory called */user/../mouse1_io1* than the output of fepsp_org2traces will be *mouse1_io1_traces.mat*
 - For your convenience, all functions work with MATLAB's tab autocompletion.
+- The analysis package is open software in accordance with the GNU General Public License version 3.0.
 
 #### Requirements
 
