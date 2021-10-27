@@ -106,7 +106,7 @@ slope_area      = p.Results.slope_area(:)'; % make sure it is row vec
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % get protocol info
-protocol_info = get_protocol("protocol_id",protocol_id,"fs",fs);
+protocol_info = fepsp_getProtocol("protocol_id",protocol_id,"fs",fs);
 % we only need the Tstamps from the parameters that require fs, so dt does
 % not have any effect - we can use the default
 

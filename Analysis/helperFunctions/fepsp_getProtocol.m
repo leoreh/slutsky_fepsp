@@ -1,4 +1,4 @@
-function protocol_info = get_protocol(varargin)
+function protocol_info = fepsp_getProtocol(varargin)
 
 % Load / create protocol info. If sampling frequency & dead time are
 % provided, convert time into sample numbers in important windows.
@@ -93,7 +93,8 @@ dt              = p.Results.dt;
 % get existing protocols form pre-defined folder inside package. We get the
 % path to the package from the path to "get_protocol" file.
 function_path = mfilename('fullpath');
-package_folder = fileparts(function_path);
+[function_folder, ~] = fileparts(function_path);
+[package_folder, ~] = fileparts(function_folder);
 saved_protocols = dir(fullfile(package_folder,'stimProtocols','*.mat'));
 [~,IDs] = cellfun(@fileparts,{saved_protocols.name},'UniformOutput',false);
 

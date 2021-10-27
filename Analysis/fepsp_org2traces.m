@@ -13,7 +13,7 @@ function [traces] = fepsp_org2traces(varargin)
 %   fs          - numeric scalar. Sampling frequency of the
 %                 recorded data [Hz]. 
 %   protocol_id - string or char. ID of stimulation protocol.
-%                 e.g. "io","stp" or "custom". See "get_protocol.m" for
+%                 e.g. "io","stp" or "custom". See "getProtocol.m" for
 %                 more info.
 %   stim_locs   - 1d cell array of intensities with each cell
 %                 containing a numeric row vector of stimulus onset indices
@@ -94,7 +94,7 @@ nStim = cellfun(@numel, stim_locs);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % create single trace template in samples according to protocol
-protocol_info = get_protocol("protocol_id", protocol_id, "fs", fs);
+protocol_info = fepsp_getProtocol("protocol_id", protocol_id, "fs", fs);
 trace_temp = floor(protocol_info.Tstamps * fs / 1000)';
 
 % snip traces from data by creating a mat of indices 

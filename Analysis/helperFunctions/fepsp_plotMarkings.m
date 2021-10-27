@@ -1,4 +1,4 @@
-function [Visu_Win] = fepsp_plot_markings(varargin)
+function [Visu_Win] = fepsp_plotMarkings(varargin)
 % Show all markings and slope areas (if avaliable) on all traces.
 %
 % INPUT (required):

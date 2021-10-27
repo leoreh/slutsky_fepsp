@@ -93,7 +93,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % get protocol info
-protocol_info = get_protocol("protocol_id",protocol_id,"fs",fs,"dt",dt);
+protocol_info = fepsp_getProtocol("protocol_id",protocol_id,"fs",fs,"dt",dt);
 % if user gave traces_xlim, take them over protocol default
 if ~isempty(traces_xlim)
     protocol_info.traces_xlim = traces_xlim;
