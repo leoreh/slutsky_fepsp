@@ -10,7 +10,7 @@
 
 % change basepath to the full path of the test data on your pc. this should
 % be the only manual adjustment necassary to run this script.
-basepath = 'D:\Code\slutsky_fepsp\Analysis\ExampleData';
+basepath = 'G:\My Drive\Projects\Inna\CodesRep\slutsky_fepsp\Analysis\ExampleData';
 
 % recording params
 fs = 20000;                 % sampling frequency
@@ -63,9 +63,12 @@ traces          = fepsp_org2traces('data_in', data_in, 'fs', fs,...
 marking_win     = fepsp_markings("traces", traces, "fs", fs,...
                 "protocol_id", protocol_id,"base_path", basepath,...
                 "intens", intens, "traces_Xlimit", [], "traces_Ylimit", [],...
-                "dt", 2, "max_time_tol", 3, "fast_mark", true);
+                "dt", 2, "max_jitter", 0.5, "fast_mark", true);
 
-% step 2.5      load the markings that were saved in step 2 
+
+% step 2.5      wait until you finished marking (closed the window) & 
+%               load the markings that were saved in step 2
+waitfor(marking_win)
 load([basename, '_fepsp_markings.mat'], "traces", "markings")
 
 % step 3        analyzes traces according to the manual markings

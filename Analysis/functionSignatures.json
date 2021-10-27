@@ -5,7 +5,7 @@
         [
             {"name":"data_in", "kind":"namevalue", "type":[["numeric", "2d"]]},
             {"name":"fs", "kind":"namevalue", "type":[["numeric", "scalar"]]},
-            {"name":"protocol_id", "kind":"namevalue", "type":[["choices=['custom',get_protocol('protocol_id','display')]"]]},
+            {"name":"protocol_id", "kind":"namevalue", "type":[["choices=['custom',fepsp_getProtocol('protocol_id','display')]"]]},
             {"name":"stim_locs", "kind":"namevalue", "type":[["cell", "vector"]]},
             {"name":"base_folder", "kind":"namevalue", "type":["folder"]},
             {"name":"rmv_trend", "kind":"namevalue", "type":[["logical"],["choices={0, 1}"]]},
@@ -18,7 +18,7 @@
         [
             {"name":"traces", "kind":"namevalue", "type":[["cell", "2d"]]},
             {"name":"fs", "kind":"namevalue", "type":[["numeric", "scalar"]]},
-            {"name":"protocol_id", "kind":"namevalue", "type":[["choices=['custom',get_protocol('protocol_id','display')]"]]},
+            {"name":"protocol_id", "kind":"namevalue", "type":[["choices=['custom',fepsp_getProtocol('protocol_id','display')]"]]},
             {"name":"intens", "kind":"namevalue", "type":[["numeric", "vector"]]},
             {"name":"traces_Xlimit", "kind":"namevalue", "type":[["numeric", "numel=2"],["@(x) isempty(x)"]]},
             {"name":"traces_Ylimit", "kind":"namevalue", "type":[["numeric", "numel=2"],["@(x) isempty(x)"]]},
@@ -34,7 +34,7 @@
         [
             {"name":"traces", "kind":"namevalue", "type":[["cell", "2d"]]},
             {"name":"fs", "kind":"namevalue", "type":[["numeric", "scalar"]]},
-            {"name":"protocol_id", "kind":"namevalue", "type":[["choices=['custom',get_protocol('protocol_id','display')]"]]},
+            {"name":"protocol_id", "kind":"namevalue", "type":[["choices=['custom',fepsp_getProtocol('protocol_id','display')]"]]},
             {"name":"markings", "kind":"namevalue", "type":[["struct", "scalar"]]},
             {"name":"slope_area", "kind":"namevalue", "type":[["numeric", "numel=2", ">=0","<=1"]]},
             {"name":"base_path", "kind":"namevalue", "type":["folder"]},
@@ -47,31 +47,7 @@
         [
             {"name":"traces", "kind":"namevalue", "type":[["cell", "2d"]]},
             {"name":"fs", "kind":"namevalue", "type":[["numeric", "scalar"]]},
-            {"name":"protocol_id", "kind":"namevalue", "type":[["choices=['custom',get_protocol('protocol_id','display')]"]]},
-            {"name":"markings", "kind":"namevalue", "type":[["struct", "scalar"]]},
-            {"name":"results", "kind":"namevalue", "type":[["struct", "scalar"]]},
-            {"name":"intens", "kind":"namevalue", "type":[["numeric", "vector"]]},
-            {"name":"traces_Xlimit", "kind":"namevalue", "type":[["numeric", "numel=2"],["@(x) isempty(x)"]]},
-            {"name":"traces_Ylimit", "kind":"namevalue", "type":[["numeric", "numel=2"],["@(x) isempty(x)"]]},
-            {"name":"dt", "kind":"namevalue", "type":[["numeric", "scalar"]]}
-        ]
-    },
-    "get_protocol":
-    {
-        "inputs":
-        [
-            {"name":"protocol_id", "kind":"namevalue", "type":[["choices=['display','custom',get_protocol('protocol_id','display')]"]]},
-            {"name":"fs", "kind":"namevalue", "type":[["numeric", "scalar"]]},
-            {"name":"dt", "kind":"namevalue", "type":[["numeric", "scalar"]]}
-        ]
-    },
-    "fepsp_plot_markings":
-    {
-        "inputs":
-        [
-            {"name":"traces", "kind":"namevalue", "type":[["cell", "2d"]]},
-            {"name":"fs", "kind":"namevalue", "type":[["numeric", "scalar"]]},
-            {"name":"protocol_id", "kind":"namevalue", "type":[["choices=['custom',get_protocol('protocol_id','display')]"]]},
+            {"name":"protocol_id", "kind":"namevalue", "type":[["choices=['custom',fepsp_getProtocol('protocol_id','display')]"]]},
             {"name":"markings", "kind":"namevalue", "type":[["struct", "scalar"]]},
             {"name":"results", "kind":"namevalue", "type":[["struct", "scalar"]]},
             {"name":"intens", "kind":"namevalue", "type":[["numeric", "vector"]]},
