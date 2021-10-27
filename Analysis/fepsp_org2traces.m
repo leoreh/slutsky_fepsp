@@ -33,6 +33,8 @@ function [traces] = fepsp_org2traces(varargin)
 %   save_var    - logical flag. Save output in base_path as
 %                 mat file named "<base_name>_fepsp_traces".
 %                 Default: true
+%   graphics    - logical flag. plot figure of traces. 
+%                 Default: true
 %
 % OUTPUT:
 %   traces      - 2d cell array of channel (row) x intensity (column) with
@@ -62,6 +64,7 @@ p.addParameter('stim_locs',     [],     @(x) validateattributes(x, {'cell'}, {'v
 p.addParameter('base_path',     pwd,    @isfolder)
 p.addParameter('rmv_trend',     true,   @(x) validateattributes(x, {'logical','numeric'}, {'binary','scalar'}))
 p.addParameter('save_var',      true,   @(x) validateattributes(x, {'logical','numeric'}, {'binary','scalar'}))
+p.addParameter('graphics',      true,   @(x) validateattributes(x, {'logical','numeric'}, {'binary','scalar'}))
 p.parse(varargin{:})
 
 data_in         =   p.Results.data_in;
@@ -71,6 +74,7 @@ stim_locs       =   p.Results.stim_locs;
 rmv_trend       =   logical(p.Results.rmv_trend);
 base_path       =   p.Results.base_path;
 save_var        =   p.Results.save_var;
+graphics        =   p.Results.graphics;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % prep data
@@ -185,24 +189,31 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % graphics
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-xstamps = [1 : trace_len] / fs * 1000;
-for ich = 1 : nCh
-    fh = figure;
-    [nsub] = numSubplots(length(traces(ich, :)));
-    yLimit = [min([traces{ich, :}], [], 'all'), max([traces{ich, :}], [], 'all')];
-    for iintens = 1 : nIntens
-        subplot(nsub(1), nsub(2), iintens)
-        plot(xstamps, traces{ich, iintens})
-        hold on
-        % plot(xstamps, trend{iCh, iIntens})
-        ylim(yLimit)
-        xlabel('Time [ms]')
-        set(gca, 'box', 'off', 'TickLength', [0 0])
-        title(['Intens ', num2str(iintens)])
+if graphics
+    xstamps = [1 : trace_len] / fs * 1000;
+    for ich = 1 : nCh
+        fh = figure;
+        fh = fepsp_graphics(fh);
+        [nsub] = numSubplots(length(traces(ich, :)));
+        yLimit = [min([traces{ich, :}], [], 'all'), max([traces{ich, :}], [], 'all')];
+        for iintens = 1 : nIntens
+            sb(iintens) = subplot(nsub(1), nsub(2), iintens);
+            plot(xstamps, traces{ich, iintens})
+            hold on
+            % plot(xstamps, trend{iCh, iIntens})
+            ylim(yLimit)
+            xlabel('Time [ms]')
+            ylabel('Voltage [mV]')
+            title(['Intens ', num2str(iintens)])
+            
+            % set graphics
+            sb(iintens) = fepsp_graphics(sb(iintens));          
+        end
+        sgtitle(['Channel ' num2str(ich)],...
+            'FontSize', 28, 'FontWeight', 'bold', 'FontName', 'FixedWidth')
+        sb(iintens) = fepsp_graphics(sb(iintens));
     end
-    sgtitle(['Channel ' num2str(ich)])
 end
-
 end
 
 % EOF

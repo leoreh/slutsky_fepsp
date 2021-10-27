@@ -189,9 +189,10 @@ end
 % label & title nicely :)
 xlabel('Time [ms]')
 ylabel('Amp [mV]')
-title({sprintf('Channel %d @ %duA', 1, intens(end)),...
-    ['\fontsize{18}', 'Move green & red lines to the start & trough of the response'],...
-    'Press Enter to save & move on'})
+title({sprintf('Channel %d @ %duA',1,intens(end))...
+    'Move green / red lines to start / peak of each response accordingly'...
+    'Press "Enter / return" to save & move to the next intensity'})
+
 
 % create Movable Lines.
 % their starting location is based on response window, in order to place
@@ -644,8 +645,11 @@ traces_plot(end).DataTipTemplate.DataTipRows(end+1) = dataTipTextRow('Avg Trace'
 
 % change title to match the new traces group
 title(ax, {sprintf('Channel %d @ %duA', wanted_ch, intens(traces_col)),...
-    ['\fontsize{18}', 'Move green & red lines to the start & trough of the response'],...
-    'Press Enter to save & move on'})
+    ['\fontsize{18}', 'Move green / red lines to start / peak of each response accordingly'],...
+    'Press Enter / return to save & move to the next intensity'})
+
+title({['\fontsize{14}', AirfoilName];'\fontsize{10}\color{blue} ';...
+       'Coefficient of Lift';'vs Angle of Attack'},'fontweight','b');
 
 % fix axis limits if necessary:
 xlim(protocol_info.traces_xlim)

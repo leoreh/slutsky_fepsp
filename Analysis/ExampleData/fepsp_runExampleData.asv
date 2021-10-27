@@ -16,7 +16,6 @@ basepath = 'D:\Code\slutsky_fepsp\Analysis\ExampleData';
 fs = 20000;                 % sampling frequency
 nChans = 3;                 % number of channels in file
 precision = 'int16';        % data saved as int16
-b2mv = 0.195 / 1000;        % conversion from bits to microvolts
 intens = [20 : 20 : 100];   % stim intensities used during recording [uA]
 protocol_id = 'io';         % input/output stimulus protocol
 
@@ -28,7 +27,7 @@ info = dir(filename);
 nSamps = info.bytes / 2 / nChans;
 fid = fopen(filename, 'r');
 precisionTxt = sprintf('%d*%s=>double', nChans, precision);
-data_in = [fread(fid, [nChans nSamps], precisionTxt)]' * b2mv;
+data_in = [fread(fid, [nChans nSamps], precisionTxt)]';
 fclose(fid);
 
 % load sample indices of stimulus onset arranged in a cell according to the
@@ -36,10 +35,12 @@ fclose(fid);
 load([basename, '_stimLocs.mat'])
 
 % graphics ----------------------------------------------------------------
+
 fh = figure;
-fh = fepsp_graphics(fh);                        % set graphics
-xstamps = [1 : nSamps] / fs;                    % recording duration [s]
-alphaIdx = linspace(0.3, 1, length(intens));    % color tranparency 
+fh = fepsp_graphics(fh);
+xstamps = [1 : nSamps] / fs;       % recording duration [s]
+alphaIdx = linspace(1, 0.3, length(intens));
+
 for ich = 1 : nChans
     sb(ich) = subplot(nChans, 1, ich);
 
@@ -48,13 +49,35 @@ for ich = 1 : nChans
     hold on
     for iintens = 1 : length(intens)
         stimVec = stim_locs{iintens} / fs;
-        ph = plot([stimVec; stimVec], ylim, '--', 'LineWidth', 2,...
-            'Color', [1, 0, 0, alphaIdx(iintens)]);     
+        ph = plot([stimVec; stimVec], ylim, '--r');
+        
+        
+        clr = ['kgggrrryyy'];        % must be sorted (i.e. g before k before r)
+    fh = figure;
+    subplot(2, 1, 1)
+    tstamps = [1 : size(wvmat, 3)] / fs * 1000;
+    ph = plot(tstamps, squeeze(wvmat(grp, ss, :)), 'LineWidth', 2);
+    clrRep = histc(clr, unique(clr));
+    clear alphaIdx
+    for i = 1 : length(clrRep)
+        alphaIdx{i} = linspace(1, 0.3, clrRep(i));
+    end
+    alphaIdx = [alphaIdx{:}];
+    if length(clr) == length(ph)
+        for i = 1 : length(ph)
+            ph(i).Color = clr(ss(i));
+            ph(i).Color(4) = alphaIdx(ss(i));
+        end
+    end
+        
+        
+        
+        
+        
     end
     xlabel('Time [s]')
-    ylabel('Voltage [mV]')
     title(['Channel ' num2str(ich)])
-    sb(ich) = fepsp_graphics(sb(ich));          % set graphics
+    sb(ich) = fepsp_graphics(sb(ich));
 end
 linkaxes(sb, 'x')
 

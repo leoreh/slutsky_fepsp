@@ -118,11 +118,14 @@ for iChan = size(traces, 1) : -1 : 1
  
     % open figure 
     sumPlot(iChan) = figure();
-    sgtitle(sprintf('Channel #%d', iChan))
+    sumPlot(iChan) = fepsp_graphics(sumPlot(iChan));          % set graphics
+    sgtitle(sprintf('Channel %d', iChan),...
+        'FontSize', 28, 'FontWeight', 'bold', 'FontName', 'FixedWidth')
+    
     if nStim > 1
-        subplot(length(intens) + 1, 1, 1)
+        sb1 = subplot(length(intens) + 1, 1, 1);
     else
-        subplot(2, 2, [1, 2])
+        sb1 = subplot(2, 2, [1, 2]);
     end
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -193,7 +196,8 @@ for iChan = size(traces, 1) : -1 : 1
     xlabel('Time [ms]')
     ylabel('Voltage [mV]')
     title('Average Traces')
-    
+    sb1 = fepsp_graphics(sb1);          % set graphics
+
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % plot analysis results
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -235,6 +239,7 @@ for iChan = size(traces, 1) : -1 : 1
             xlabel('Number of Stimulation [#]')
             ylabel({'Mean Part of' 'First Stimulation' '[stim/(stim num 1)]'})
             legend(color_box(1:2),['Slope: ' slope_area_label],'Amplitude','Location','best')
+            loop_subplot = fepsp_graphics(loop_subplot);          % set graphics
         end
     else
         % only 1 stimulation in protocol - show input-output
@@ -258,7 +263,8 @@ for iChan = size(traces, 1) : -1 : 1
             iIntens = intens_order(end-iBox+1); % intensity is inversed & sorted between box & input intens order
             color_box(iBox) = patch(get(box_edges(iBox),'XData'),get(box_edges(iBox),'YData'),traces_avg_h(iIntens).Color,'FaceAlpha',.5,'PickableParts','none');
         end
-        
+        loop_subplot = fepsp_graphics(loop_subplot);          % set graphics
+
         % plot input-output for slope
         loop_subplot = subplot(2, 2, 4);
         slope_all_intens = [Slope{iChan,:}];
@@ -266,13 +272,14 @@ for iChan = size(traces, 1) : -1 : 1
         xlabel('Intensity [uA]')
         ylabel('Slope [mV/ms]')
         title(['Input/Output (Slope: ' slope_area_label ')'])
-        
+
         % color boxplots 2 match avg_traces_plot colors
         box_edges = findobj(loop_subplot,'Tag','Box');
         for iBox = nIntens:-1:1
             iIntens = intens_order(end-iBox+1); % intensity is inversed & sorted between box & input intens order
             color_box(iBox) = patch(get(box_edges(iBox),'XData'),get(box_edges(iBox),'YData'),traces_avg_h(iIntens).Color,'FaceAlpha',.5,'PickableParts','none');
         end
+        loop_subplot = fepsp_graphics(loop_subplot);          % set graphics
     end
 end
 
