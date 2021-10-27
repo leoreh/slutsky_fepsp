@@ -23,16 +23,16 @@ Here you will find resources for recording *in vivo* field excitatory post synap
 **fepsp_org2traces** - Organize the raw data according to the stimulus protocol, number of channels, number of intensities, etc..<br>
 format accepted by Take a raw channel data, extract only the stimulus protocol repetitions, and organize everything in a way the package expect.<br>
 
-<img src="Analysis/Graphics/traces.tif" width=500 ><br>
+<img src="Analysis/Graphics/traces.png" width=500 ><br>
 
 **fepsp_markings** - Plot traces and manually mark the start and peak of the evoked responses. <br>
 
-<img src="Analysis/Graphics/markings.tif" width=500 ><br>
+<img src="Analysis/Graphics/markings.png" width=500 ><br>
 
 **fepsp_analyse** - Calculate slope and amplitude for each trace and the average fepsp_org2traces.<br>
 **fepsp_summaryPlot** - Summary plot of the data after analysis.
 
-<img src="Analysis/Graphics/summaryPlot.tif" width=500 ><br>
+<img src="Analysis/Graphics/summaryPlot.png" width=500 ><br>
 
 
 #### Requirements
