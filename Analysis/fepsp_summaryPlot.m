@@ -1,4 +1,4 @@
-function [analysed_fepsp] = fepsp_show(varargin)
+function [sumPlot] = fepsp_summaryPlot(varargin)
 % Create a figure for each channel, summarising the fepsp experiment.
 % Will create input-output graph if protocol has only 1 stimulus, and
 % facilitation graph if it has more.
@@ -7,12 +7,10 @@ function [analysed_fepsp] = fepsp_show(varargin)
 %   traces      - 2d cell array. see fepsp_org2traces.m. 
 %   fs          - Numeric scalar. sampling frequency [Hz].
 %   protocol_id - String or char. ID of stimulation protocol.
-%                 e.g. "io","stp" or "custom". See "get_protocol.m" for
+%                 e.g. "io","stp" or "custom". See "fepsp_getProtocol.m" for
 %                 more info.
-%   markings    - Struct. Hold all of the responses "starts" & "peaks"
-%                 loacations. See "fepsp_markings.m" for more info.
-%   results     - Struct. Hold all of the analysis results & info. 
-%                 See "fepsp_analyse.m" for more info.
+%   markings    - Struct. See "fepsp_markings.m" for more info.
+%   results     - Struct. See "fepsp_analyse.m" for more info.
 
 % INPUT (optional):
 %   intens      - numeric vector of stimulus intensities used for each
@@ -24,31 +22,30 @@ function [analysed_fepsp] = fepsp_show(varargin)
 %                 example, xLimit = [-1 30] will show the trace from 1 ms
 %                 before the stimulus until 30 ms after the stimulus. If
 %                 empty will use protocol default values. See
-%                 "get_protocol.m" for more info. 
+%                 "fepsp_getProtocol.m" for more info. 
 %                 Default: [].
 %   traces_ylim - numeric vector with 2 elements. voltage limits for
 %                 displaying the trace [mV]. These y-limits remain constant
 %                 throughout all intensities. If empty will be set
-%                 widest values in each channel (excluding stimulus
-%                 artifact). 
+%                 according to the max range in each channel (excluding
+%                 stimulus artifact). 
 %                 Default: [].
 %   dt          - non-negative scalar. Dead time between
-%                 stimulus onset & earliest possible response [ms].
+%                 stimulus onset and earliest possible response [ms].
 %                 Used to omit stimulus artifact from analysis. 
-%                 See "get_protocol.m" for more info.
+%                 See "fepsp_getProtocol.m" for more info.
 %                 Default: 2.
 %
 % OUTPUT:
-%   analysed_fepsp
-%               - figure handles array. Handles to the summary figures, one
+%   sumPlot     - figure handles array. Handles to the summary figures, one
 %                 for each channel.
 %
 % CALL:
-%   analysed_fepsp = fepsp_show("traces", <cell array>, "fs", <numeric
-%   scalar>, "protocol_id", <string scalar>,"markings",<struct
-%   scalar>,"results",<struct scalar or empty>,"intens",<numeric
-%   vector>,"traces_Xlimit",<numeric 2 elements or empty>,
-%   "traces_Ylimit",<numeric 2 elements or empty>,"dt",<numeric
+%   sumPlot = fepsp_show("traces", <cell array>, "fs", <numeric
+%   scalar>, "protocol_id", <string scalar>, "markings", <struct
+%   scalar>, "results", <struct scalar or empty>, "intens", <numeric
+%   vector>, "traces_Xlimit", <numeric 2 elements or empty>,
+%   "traces_Ylimit", <numeric 2 elements or empty>, "dt", <numeric
 %   non-negative scalar>)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -81,36 +78,35 @@ traces_xlim     = sort(p.Results.traces_xlim);
 traces_ylim     = sort(p.Results.traces_ylim);
 dt              = p.Results.dt;
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% prep
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 % validate intens
 if isempty(intens)
-    intens = -(size(traces,2):-1:1);
-elseif numel(intens) ~= size(traces,2)
-    error('Number of inten does not match number of intensities in traces (number of columns in the cell array)')
+    intens = -(size(traces, 2): -1 : 1);
+elseif numel(intens) ~= size(traces, 2)
+    error('discripancy between the length of intens and the size of traces')
 end
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% helper vars
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% get protocol info
+% protocol info
 protocol_info = fepsp_getProtocol("protocol_id",protocol_id,"fs",fs,"dt",dt);
-% if user gave traces_xlim, take them over protocol default
+
+% xlim for plot
 if ~isempty(traces_xlim)
     protocol_info.traces_xlim = traces_xlim;
 end
 
-% get how many intensities & stimulations there are
+% stim params 
 nIntens = length(intens);
 nStim = protocol_info.nStim;
+[intens_sorted, intens_order] = sort(intens, 'ascend');
 
-% find the order of intensities
-[intens_sorted,intens_order] = sort(intens,'ascend');
-
-% get parameters about slope measured area
+% slop params
 slope_window_avg = results.avg_traces.slope_win;
-slope_area_label = sprintf('%.3g%% to %.3g%%',results.slope_area*100);
+slope_area_label = sprintf('%.3g%% to %.3g%%', results.slope_area * 100);
 
-% get calculated slope & amplitude
+% results data
 Amp = results.all_traces.Amp;
 Slope =  results.all_traces.Slope;
 
@@ -118,89 +114,82 @@ Slope =  results.all_traces.Slope;
 % build figures
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-for iChan = size(traces,1):-1:1
+for iChan = size(traces, 1) : -1 : 1
  
-    % open figure & subplots
-    analysed_fepsp(iChan) = figure();
-    sgtitle(sprintf('Channel #%d', iChan),'Interpreter','none')
+    % open figure 
+    sumPlot(iChan) = figure();
+    sgtitle(sprintf('Channel #%d', iChan))
     if nStim > 1
-        subplot(length(intens)+1, 1, 1)
+        subplot(length(intens) + 1, 1, 1)
     else
-        subplot(2, 2, [1 2])
+        subplot(2, 2, [1, 2])
     end
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % plot average traces for all intensities
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
-    % get average traces
-    for iInten = nIntens:-1:1
-        % convert deleted traces to NaN before averaging, by finding what
-        % Amp columns are NaN
-        deleted_traces = all(isnan(Amp{iChan,iInten}),1);
-        loop_traces_group = traces{iChan,iInten};
-        loop_traces_group(:,deleted_traces) = nan;
-        % create average trace
-        avg_traces(:,iInten) = mean(loop_traces_group,2,'omitnan');
-    end
+    % avg trace for each intensity
+    traces_avg = cell2mat(cellfun(@(x) mean(x, 2, 'omitnan'),...
+        traces(iChan, :), 'UniformOutput', false));
     
-    % plot average traces and add intensity to datatips
-    avg_traces_plot = plot(protocol_info.Tstamps,avg_traces,'LineWidth',1);
-    for iInten = 1:nIntens
-        avg_traces_plot(iInten).Tag = num2str(intens(iInten));
-        r = dataTipTextRow('intensity',ones(size(avg_traces_plot(iInten).XData))*intens(iInten));
-        avg_traces_plot(iInten).DataTipTemplate.DataTipRows(end+1) = r;
+    % plot and change data tips
+    traces_avg_h = plot(protocol_info.Tstamps, traces_avg, 'LineWidth', 1);
+    for iIntens = 1 : nIntens
+        traces_avg_h(iIntens).Tag = num2str(intens(iIntens));
+        r = dataTipTextRow('intensity', ones(size(traces_avg_h(iIntens).XData)) * intens(iIntens));
+        traces_avg_h(iIntens).DataTipTemplate.DataTipRows(end+1) = r;
     end
     hold on
     
-    % create start markers:
-    % convert indices from subscripts to linear, in order to maintain 1
-    % index refer 1 sample.
-    loop_starts_avg = [markings.starts_avg{iChan,:}];
-    linear_starts = sub2ind(size(avg_traces),loop_starts_avg,repmat(1:nIntens,nStim,1));
-    % plot starts as scatter
-    starts_scatter = plot(protocol_info.Tstamps(loop_starts_avg),avg_traces(linear_starts),'k*');
+    % plot start markings
+    starts_avg = [markings.starts_avg{iChan,:}];
+    starts_lin = sub2ind(size(traces_avg), starts_avg,...
+        repmat(1 : nIntens, nStim, 1));
+    starts_h = plot(protocol_info.Tstamps(starts_avg), traces_avg(starts_lin), 'k*');
     
-    % plot peaks markers:
-    % get linear index
-    loop_peaks_avg = [markings.peaks_avg{iChan,:}];
-    linear_peaks = sub2ind(size(avg_traces),loop_peaks_avg,repmat(1:nIntens,nStim,1));
-    % plot peaks as scatter
-    peaks_scatter = plot(protocol_info.Tstamps(loop_peaks_avg),avg_traces(linear_peaks),'kO');
+    % plot peak markings
+    peaks_avg = [markings.peaks_avg{iChan,:}];
+    peaks_lin = sub2ind(size(traces_avg), peaks_avg,...
+        repmat(1:nIntens, nStim, 1));
+    peaks_h = plot(protocol_info.Tstamps(peaks_avg), traces_avg(peaks_lin), 'kO');
     
-    % colour slope area in each trace
-    for iStim = nStim:-1:1
-        for iInten = nIntens:-1:1
+    % color slope area in each trace
+    for iStim = nStim : -1 : 1
+        for iIntens = nIntens : -1 : 1
             % get slope window & plot on top of samples matching it
-            loop_slope_window = sort(slope_window_avg{iChan,iInten}(:,iStim)); % sorted to prevent colon operator break
-            slope_area_mark(iInten) = plot(protocol_info.Tstamps(loop_slope_window(1):loop_slope_window(2)),...
-                avg_traces(loop_slope_window(1):loop_slope_window(2),iInten),'r','LineWidth',3);
-            % make marked area transparent
-            slope_area_mark(iInten).Color(4) = 0.5;
-            % make marked area not appear in legend
-            slope_area_mark(iInten).Annotation.LegendInformation.IconDisplayStyle = 'off';
-            % make hover data tips take from the line under the marked area
-            slope_area_mark(iInten).PickableParts = 'none';
+            loop_slope_window = sort(slope_window_avg{iChan, iIntens}(:, iStim)); 
+            slope_area_mark(iIntens) =...
+                plot(protocol_info.Tstamps(loop_slope_window(1) : loop_slope_window(2)),...
+                traces_avg(loop_slope_window(1) : loop_slope_window(2), iIntens), 'r', 'LineWidth', 3);
+            % make transparent
+            slope_area_mark(iIntens).Color(4) = 0.5;
+            % remove from legend
+            slope_area_mark(iIntens).Annotation.LegendInformation.IconDisplayStyle = 'off';
+            % remove from data tips selection
+            slope_area_mark(iIntens).PickableParts = 'none';
         end
     end
     
-    % finishing touch:
-    % fix axes limit for visibility by windows
+    % axes limits
     xlim(protocol_info.traces_xlim)
     if isempty(traces_ylim)
-        ylim([min(avg_traces(protocol_info.response.win,:),[],'all') max(avg_traces(protocol_info.response.win,:),[],'all')].*1.1)
+        ylim([min(traces_avg(protocol_info.response.win, :), [], 'all')...
+            max(traces_avg(protocol_info.response.win,:), [], 'all')] .* 1.1)
     else
         ylim(traces_ylim)
     end
     
-    % add legend
-    legend([avg_traces_plot(intens_order);starts_scatter(1);peaks_scatter(1)],[string(intens_sorted),{'response Start','response Peak'}],...
-        'Location','southeast','NumColumns',2)
+    % legend
+    legend([traces_avg_h(intens_order); starts_h(1); peaks_h(1)],...
+        [string(intens_sorted), {'response Start', 'response Peak'}],...
+        'Location','southeast','NumColumns', 2)
     
-    % make 1 of the marked area appear in legend, to represent all of them
+    % show one reprasentative slope
     slope_area_mark(1).Annotation.LegendInformation.IconDisplayStyle = 'on';
     slope_area_mark(1).DisplayName = ['Slope: ' slope_area_label];
-    % axis labels & title
+    
+    % labels
     xlabel('Time [ms]')
     ylabel('Voltage [mV]')
     title('Average Traces')
@@ -212,16 +201,16 @@ for iChan = size(traces,1):-1:1
     if nStim > 1
         % multi stimuli protocol - show facilitation.
         % for each intensity create 1 box plot for amplitude & 1 for slope
-        for iInten = 1:nIntens
-            loop_subplot = subplot(nIntens+1, 1, iInten+1);
+        for iIntens = 1 : nIntens
+            loop_subplot = subplot(nIntens + 1, 1, iIntens + 1);
             
             % normalised amplitude & slope
-            loop_amp_norm = Amp{iChan, iInten}./Amp{iChan, iInten}(1,:);
-            loop_slope_norm = Slope{iChan, iInten}./Slope{iChan, iInten}(1,:);
+            loop_amp_norm = Amp{iChan, iIntens}./Amp{iChan, iIntens}(1,:);
+            loop_slope_norm = Slope{iChan, iIntens}./Slope{iChan, iIntens}(1,:);
             
             % order data so amplitude & slope are next to each other in
             % every stimulus number
-            cat_data = nan(size(traces{iChan, iInten},2),2*nStim);
+            cat_data = nan(size(traces{iChan, iIntens},2),2*nStim);
             col2fill = mat2cell(1:2*nStim,1,ones(1,nStim)*2);
             for iStim = nStim:-1:1
                 cat_data(:,col2fill{iStim}) = [loop_amp_norm(iStim,:)' loop_slope_norm(iStim,:)'];
@@ -266,8 +255,8 @@ for iChan = size(traces,1):-1:1
         % color boxplots 2 match avg_traces_plot colors
         box_edges = findobj(loop_subplot,'Tag','Box');
         for iBox = nIntens:-1:1
-            iInten = intens_order(end-iBox+1); % intensity is inversed & sorted between box & input intens order
-            color_box(iBox) = patch(get(box_edges(iBox),'XData'),get(box_edges(iBox),'YData'),avg_traces_plot(iInten).Color,'FaceAlpha',.5,'PickableParts','none');
+            iIntens = intens_order(end-iBox+1); % intensity is inversed & sorted between box & input intens order
+            color_box(iBox) = patch(get(box_edges(iBox),'XData'),get(box_edges(iBox),'YData'),traces_avg_h(iIntens).Color,'FaceAlpha',.5,'PickableParts','none');
         end
         
         % plot input-output for slope
@@ -281,8 +270,8 @@ for iChan = size(traces,1):-1:1
         % color boxplots 2 match avg_traces_plot colors
         box_edges = findobj(loop_subplot,'Tag','Box');
         for iBox = nIntens:-1:1
-            iInten = intens_order(end-iBox+1); % intensity is inversed & sorted between box & input intens order
-            color_box(iBox) = patch(get(box_edges(iBox),'XData'),get(box_edges(iBox),'YData'),avg_traces_plot(iInten).Color,'FaceAlpha',.5,'PickableParts','none');
+            iIntens = intens_order(end-iBox+1); % intensity is inversed & sorted between box & input intens order
+            color_box(iBox) = patch(get(box_edges(iBox),'XData'),get(box_edges(iBox),'YData'),traces_avg_h(iIntens).Color,'FaceAlpha',.5,'PickableParts','none');
         end
     end
 end

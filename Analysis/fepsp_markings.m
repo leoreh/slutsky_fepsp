@@ -11,7 +11,7 @@ function marking_fig = fepsp_markings(varargin)
 %   traces      - 2d cell array. see fepsp_org2traces.m. 
 %   fs          - numeric scalar. sampling frequency [Hz].
 %   protocol_id - string or char. ID of stimulation protocol.
-%                 e.g. "io","stp" or "custom". See "get_protocol.m" for
+%                 e.g. "io","stp" or "custom". See "fepsp_getProtocol.m" for
 %                 more info.
 
 % INPUT (optional):
@@ -29,7 +29,7 @@ function marking_fig = fepsp_markings(varargin)
 %                 example, xLimit = [-1 30] will show the trace from 1 ms
 %                 before the stimulus until 30 ms after the stimulus. If
 %                 empty will use protocol default values. See
-%                 "get_protocol.m" for more info. 
+%                 "fepsp_getProtocol.m" for more info. 
 %                 Default: [].
 %   traces_ylim - numeric vector with 2 elements. voltage limits for
 %                 displaying the trace [mV]. these y-limits remain constant
@@ -40,7 +40,7 @@ function marking_fig = fepsp_markings(varargin)
 %   dt          - non-negative scalar. Dead time between
 %                 stimulus onset & earliest possible response [ms].
 %                 Used to omit stimulus artifact from analysis. 
-%                 See "get_protocol.m" for more info.
+%                 See "fepsp_getProtocol.m" for more info.
 %                 Default: 2.
 %   max_jitter  - non-negative scalar. Time tolerance for selecting
 %                 the response boundaries [ms]. I.e., the precise start

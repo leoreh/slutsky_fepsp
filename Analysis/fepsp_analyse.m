@@ -6,7 +6,7 @@ function [results]= fepsp_analyse(varargin)
 %   traces      - 2d cell array. see fepsp_org2traces.m. 
 %   fs          - numeric scalar. sampling frequency [Hz].
 %   protocol_id - string or char. ID of stimulation protocol.
-%                 e.g. "io","stp" or "custom". See "get_protocol.m" for
+%                 e.g. "io","stp" or "custom". See "fepsp_getProtocol.m" for
 %                 more info.
 %   markings    - struct. Hold all of the responses "starts" & "peaks"
 %                 loacations. See "fepsp_markings.m" for more info.

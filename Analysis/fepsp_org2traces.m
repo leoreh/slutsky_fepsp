@@ -185,23 +185,23 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % graphics
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% xstamps = [1 : trace_len] / fs * 1000;
-% for ich = 1 : nCh
-%     fh = figure;
-%     [nsub] = numSubplots(length(traces(ich, :)));
-%     yLimit = [min([traces{ich, :}], [], 'all'), max([traces{ich, :}], [], 'all')];
-%     for iintens = 1 : nIntens
-%         subplot(nsub(1), nsub(2), iintens)
-%         plot(xstamps, traces{ich, iintens})
-%         hold on
-%         plot(xstamps, trend{iCh, iIntens})
-%         ylim(yLimit)
-%         xlabel('Time [ms]')
-%         set(gca, 'box', 'off', 'TickLength', [0 0])
-%         title(['Intens ', num2str(iintens)])
-%     end
-%     sgtitle(['Channel ' num2str(ich)])
-% end
+xstamps = [1 : trace_len] / fs * 1000;
+for ich = 1 : nCh
+    fh = figure;
+    [nsub] = numSubplots(length(traces(ich, :)));
+    yLimit = [min([traces{ich, :}], [], 'all'), max([traces{ich, :}], [], 'all')];
+    for iintens = 1 : nIntens
+        subplot(nsub(1), nsub(2), iintens)
+        plot(xstamps, traces{ich, iintens})
+        hold on
+        % plot(xstamps, trend{iCh, iIntens})
+        ylim(yLimit)
+        xlabel('Time [ms]')
+        set(gca, 'box', 'off', 'TickLength', [0 0])
+        title(['Intens ', num2str(iintens)])
+    end
+    sgtitle(['Channel ' num2str(ich)])
+end
 
 end
 
