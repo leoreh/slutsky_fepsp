@@ -94,7 +94,7 @@ dt              = p.Results.dt;
 % path to the package from the path to "get_protocol" file.
 function_path = mfilename('fullpath');
 package_folder = fileparts(function_path);
-saved_protocols = dir(fullfile(package_folder,'protocols_data','*.mat'));
+saved_protocols = dir(fullfile(package_folder,'stimProtocols','*.mat'));
 [~,IDs] = cellfun(@fileparts,{saved_protocols.name},'UniformOutput',false);
 
 % force IDs to be cell (if there is only 1 protocol, it will be char instead)
@@ -164,10 +164,10 @@ switch protocol_id
             end
             
             % make dir if needed and save protocol
-            if ~exist(fullfile(package_folder,'protocols_data'),'dir')
-                mkdir(fullfile(package_folder,'protocols_data'))
+            if ~exist(fullfile(package_folder,'stimProtocols'),'dir')
+                mkdir(fullfile(package_folder,'stimProtocols'))
             end
-            save(fullfile(package_folder,'protocols_data',[protocol_info.protocol_id '.mat']),'protocol_info')
+            save(fullfile(package_folder,'stimProtocols',[protocol_info.protocol_id '.mat']),'protocol_info')
         end
         
         
@@ -183,7 +183,7 @@ switch protocol_id
             error(['Cannot find protocol ID %s. Known protocols ID are: {%s}. ',...
                 'Use protocol_id "custom" to add a new protocol'],protocol_id,strjoin(IDs,','))
         end
-        filename = fullfile(package_folder,'protocols_data',join([protocol_id '.mat'],''));
+        filename = fullfile(package_folder,'stimProtocols',join([protocol_id '.mat'],''));
         load(filename,'protocol_info')
 end
 

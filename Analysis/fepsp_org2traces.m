@@ -76,6 +76,13 @@ save_var        =   p.Results.save_var;
 % prep data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% validate stimIdx
+if any(~cellfun(@isvector, stim_locs))
+    error('stim_locs must contain vectors only')
+end
+stim_locs = stim_locs(:)';
+stim_locs = cellfun(@(x) x(:)', stim_locs, 'UniformOutput', false);
+
 % data params
 nCh = size(data_in, 2);
 nSamp = size(data_in, 1);
@@ -87,14 +94,14 @@ nStim = cellfun(@numel, stim_locs);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % create single trace template in samples according to protocol
-protocol_info = get_protocol("protocol_id",protocol_id,"fs",fs);
-trace_temp = floor(protocol_info.Tstamps*fs/1000)';
+protocol_info = get_protocol("protocol_id", protocol_id, "fs", fs);
+trace_temp = floor(protocol_info.Tstamps * fs / 1000)';
 
 % snip traces from data by creating a mat of indices 
 traces_matIdx = trace_temp' + [stim_locs{:}];
 
 try
-    traces_mat = data_in(traces_matIdx,:);
+    traces_mat = data_in(traces_matIdx, :);
 
 catch err
     % check if error is due to traces out of bound
@@ -174,6 +181,27 @@ if save_var
     traces_file = fullfile(base_path, [base_name '_fepsp_traces.mat']);
     save(traces_file, 'traces', 'fs', 'protocol_id')
 end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% graphics
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% xstamps = [1 : trace_len] / fs * 1000;
+% for ich = 1 : nCh
+%     fh = figure;
+%     [nsub] = numSubplots(length(traces(ich, :)));
+%     yLimit = [min([traces{ich, :}], [], 'all'), max([traces{ich, :}], [], 'all')];
+%     for iintens = 1 : nIntens
+%         subplot(nsub(1), nsub(2), iintens)
+%         plot(xstamps, traces{ich, iintens})
+%         hold on
+%         plot(xstamps, trend{iCh, iIntens})
+%         ylim(yLimit)
+%         xlabel('Time [ms]')
+%         set(gca, 'box', 'off', 'TickLength', [0 0])
+%         title(['Intens ', num2str(iintens)])
+%     end
+%     sgtitle(['Channel ' num2str(ich)])
+% end
 
 end
 
