@@ -18,7 +18,9 @@ Here you will find resources for recording *in vivo* field excitatory post synap
 
 **Before you begin** - Prepare the raw data including times of stimulus onset.<br>
 
-<img src="Graphics/rawData.png" width=100 ><br>
+<img src="/Graphics/rawData.png" width=100 ><br>
+
+![](Graphics/rawData.png)
 
 **fepsp_org2traces** - Organize the raw data according to the stimulus protocol, number of channels, number of intensities, etc..<br>
 format accepted by Take a raw channel data, extract only the stimulus protocol repetitions, and organize everything in a way the package expect.<br>
