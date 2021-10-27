@@ -43,9 +43,9 @@ format accepted by Take a raw channel data, extract only the stimulus protocol r
 
 - Hardware: This package can run on any computer capable of running MATLAB 2019a.
 - Software: This package requires MATLAB© 2019a or higher with the following toolboxes:
- - Image Processing Toolbox™,
- - Signal Processing Toolbox™
- - Statistics and Machine Learning Toolbox™
+    - Image Processing Toolbox™,
+    - Signal Processing Toolbox™
+    - Statistics and Machine Learning Toolbox™
 
 #### Citation
 The analysis package was written by Lior de Marcas and Leore R. Heim.<br>
