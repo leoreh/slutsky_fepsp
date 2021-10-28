@@ -14,20 +14,32 @@ Here you will find resources for recording *in vivo* field excitatory post synap
 
 **See the ExampleData directory for a full rundown of the analysis functions.**
 
-#### Pipeline
+### Pipeline
 
-**Before you begin** - Prepare the raw data including times of stimulus onset.<br>
+#### Before you begin
+Prepare the raw data including times of stimulus onset.<br>
 
 <img src="Analysis/Graphics/rawData.png" width=750 ><br>
 
-**fepsp_org2traces** - Organize the raw data according to the stimulus protocol, number of channels, number of intensities, etc..<br>
-format accepted by Take a raw channel data, extract only the stimulus protocol repetitions, and organize everything in a way the package expect.<br>
+
+#### fepsp_org2traces
+Organizes the raw data according to the stimulus protocol, number of channels, number of intensities, etc...<br>
+Allows removing the trend (mean and slope) from individual traces.<br>
+Outputs traces in a cell array. The format of traces if crucial for the rest of the pipeline.
 
 <img src="Analysis/Graphics/traces.png" width=750 ><br>
 
-**fepsp_markings** - Plot traces and manually mark the start and peak of the evoked responses. <br>
+
+#### fepsp_markings
+GUI for manually marking the start and peak of each trace.<br>
+The number of marker pairs is determined by the number of stimuli in a trace.<br>
+Compensates for small inaccuracies in the manual markings by jittering in time the markers closer to the peak.<br>
+Allows removal or inversion of individual traces. <br>
+Provides easy navigation between all channels and intensities.<br>
+In 'fast mode', only the highest intensity per channel will be presented by default.
 
 <img src="Analysis/Graphics/markings.png" width=750 ><br>
+
 
 **fepsp_analyse** - Calculate slope and amplitude for each trace and the average fepsp_org2traces.<br>
 **fepsp_summaryPlot** - Summary plot of the data after analysis.

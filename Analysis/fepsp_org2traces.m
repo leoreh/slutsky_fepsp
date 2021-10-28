@@ -3,7 +3,8 @@ function [traces] = fepsp_org2traces(varargin)
 % organizes continuous data (data_in) into a cell array of traces for
 % downstream analysis. Requires indices of stimulation onset (stim_locs)
 % arranged in a cell array according to intensities. Organization is done
-% according to a predefined stimulation protocol. 
+% according to a predefined stimulation protocol. Allows removing the
+% trend (mean and slope) from individual traces.
 % 
 % For more information see https://github.com/leoreh/slutsky_fepsp.
 %

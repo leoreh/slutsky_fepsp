@@ -2,10 +2,14 @@ function marking_fig = fepsp_markings(varargin)
 
 % creates gui for user to mark start (green) and end (red) points of a
 % response. user can choose to go through all intensities or just one
-% intensity per channel (see fast_mark). the number of marker pairs in
-% a trace is determined by the number of stimulations derived from the
-% stimulus protocol. the output consists of markings for each trace
-% separately and markings for the average trace. 
+% intensity per channel (see fast_mark). the number of marker pairs in a
+% trace is determined by the number of stimulations derived from the
+% stimulus protocol. provides easy navigation between all channels and
+% intensities. the output consists of markings for each trace separately
+% and markings for the average trace. allows removal or inversion of
+% individual traces (right click on plot). compensates for small
+% inaccuracies in the manual markings by jittering in time the markers
+% closer to the peak (max_jitter).
 %
 % INPUT (required):
 %   traces      - 2d cell array. see fepsp_org2traces.m. 
