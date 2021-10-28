@@ -14,6 +14,8 @@ Here you will find resources for recording *in vivo* field excitatory post synap
 
 ### See the ExampleData directory for a full rundown of the package
 
+<img src="Analysis/Graphics/FlowChart.png" width=750 ><br>
+
 ### Pipeline
 
 #### Before you begin
