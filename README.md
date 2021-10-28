@@ -1,6 +1,6 @@
 # Welcome to the Slutsky Lab fEPSP Repository!
 
-Here you will find resources designed to assist in recordings of *in vivo* field excitatory post synaptic potentials (fEPSPs) alongside a MATLAB© based package for the analysis of the recorded signals.
+Here you will find resources designed to assist in recordings of *in vivo* field excitatory post synaptic potentials (fEPSPs) alongside a MATLAB© based package for data analysis of the recorded signals.
 
 ## Resources
 
