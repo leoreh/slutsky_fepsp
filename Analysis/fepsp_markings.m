@@ -836,9 +836,11 @@ traces                  = marking_fig.UserData.fepsp_data.traces;
 base_path = marking_fig.UserData.base_path;
 [~,base_name] = fileparts(base_path);
 marking_file = [base_path filesep base_name '_fepsp_markings.mat'];
+traces_file = [base_path filesep base_name '_fepsp_traces.mat'];
 
 % save
-save(marking_file,'markings','traces')
+save(marking_file, 'markings', 'traces')
+save(traces_file, 'traces', 'traces')
 
 end
 

@@ -72,11 +72,11 @@ marking_win     = fepsp_markings("traces", traces, "fs", fs,...
                 "intens", intens, "traces_Xlimit", [], "traces_Ylimit", [],...
                 "dt", 2, "max_jitter", 0.5, "fast_mark", true);
 
-
 % step 2.5      wait until you finished marking (closed the window) & 
 %               load the markings that were saved in step 2
 waitfor(marking_win)
-load([basename, '_fepsp_markings.mat'], "traces", "markings")
+load([basename, '_fepsp_markings.mat'], "markings")
+load([basename, '_fepsp_traces.mat'], "traces")
 
 % step 3        analyzes traces according to the manual markings
 results         = fepsp_analyse("traces", traces, "fs", fs,...
