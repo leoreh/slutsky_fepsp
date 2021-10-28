@@ -1,14 +1,12 @@
 # Welcome to the Slutsky Lab fEPSP Repository!
 
-Here you will find resources for recording *in vivo* field excitatory post synaptic potentials (fEPSPs) and a MATLAB© based package for analysis of the recorded signals.
+Here you will find resources designed to assist in the recordings of *in vivo* field excitatory post synaptic potentials (fEPSPs) alongside a MATLAB© based package for the analysis of the recorded signals.
 
 ## Resources
 
 - Stimulation protocols written for winWCP and Arduino
 - A spreadsheet for easy localization of implant coordinates during surgery
 - CAD files for printing and/or machining components designed for custom head fixation apparatus
-
-
 
 ## Analysis
 
