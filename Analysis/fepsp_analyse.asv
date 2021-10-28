@@ -1,8 +1,6 @@
 function [results]= fepsp_analyse(varargin)
-
-% Calculate amplitude and slope for each trace (repetition) according to
-% the start and peak markings of each response. the area of the slop can be
-% determined by the user (slope_area). 
+% Calculate amplitude and slope for each trace (repetition), using marking
+% of the start & peak of each response.
 %
 % INPUT (required):
 %   traces      - 2d cell array. see fepsp_org2traces.m. 
@@ -12,7 +10,7 @@ function [results]= fepsp_analyse(varargin)
 %                 e.g. "io", "stp" or "custom". See "fepsp_getProtocol.m".
 
 % INPUT (optional):
-%   slope_area  - optional. Numeric 2 elements between 0-1. Part of
+%   slope_area  - optional. Numeric 2 elements between 0 & 1. Part of
 %                 amplitude to measure the slope between. For example, if
 %                 slope_area is [0.2 0.9] then slope will be measured in
 %                 the response between the points that match 20% & 90% of
@@ -286,7 +284,8 @@ p_vec = Amp*slope_area;
 % amplitude to wanted percentile of general amplitude
 [~,slope_win] = min(abs(points_amp-p_vec),[],1);
 
-% convert slope_window to sample numbers
+% right now, slope_window match the response_win instead of sample numbers
+% in the general trace. Convert them.
 slope_win = slope_win + s2p_win(1) - 1;
 
 % if there is a significant biphasic event inside the

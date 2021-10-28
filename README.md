@@ -12,7 +12,7 @@ Here you will find resources for recording *in vivo* field excitatory post synap
 
 ## Analysis
 
-**See the ExampleData directory for a full rundown of the analysis functions.**
+### See the ExampleData directory for a full rundown of the package
 
 ### Pipeline
 
@@ -23,7 +23,7 @@ Prepare the raw data including times of stimulus onset.<br>
 
 
 #### fepsp_org2traces
-Organizes the raw data according to the stimulus protocol, number of channels, number of intensities, etc...<br>
+Organizes raw data according to stimulus protocol, number of channels, number of intensities, etc...<br>
 Allows removing the trend (mean and slope) from individual traces.<br>
 Outputs traces in a cell array. The format of traces if crucial for the rest of the pipeline.
 
@@ -36,22 +36,32 @@ The number of marker pairs is determined by the number of stimuli in a trace.<br
 Compensates for small inaccuracies in the manual markings by jittering in time the markers closer to the peak.<br>
 Allows removal or inversion of individual traces. <br>
 Provides easy navigation between all channels and intensities.<br>
-In 'fast mode', only the highest intensity per channel will be presented by default.
+In 'fast mode', only the highest intensity per channel will be presented by default.<br>
+Saves markings as a struct with four cells: start and peak for individual and average traces.<br>
+Updates traces according to the changes done in the GUI.<br>
 
 <img src="Analysis/Graphics/markings.png" width=750 ><br>
 
 
-**fepsp_analyse** - Calculate slope and amplitude for each trace and the average fepsp_org2traces.<br>
-**fepsp_summaryPlot** - Summary plot of the data after analysis.
+#### fepsp_analyse
+Calculate slope and amplitude for the individual and average traces.<br>
+Allows user to determine the area for slope calculation.<br>
+Outputs results as struct.
+
+#### fepsp_summaryPlot
+Summary plot of the results.<br>
+Two variants of the main figure:
+1. One for traces with a single stimulus (e.g. I/O; see figure below).
+2. One for traces with multiple stimuli (e.g. STP).
 
 <img src="Analysis/Graphics/summaryPlot.png" width=750 ><br>
 
-#### Notes
+### Notes
 - The pipeline assumes each recording is in its own directory and will use the name of that directory when saving files. For example, if the recording is in a directory called */user/../mouse1_io1* then the output of fepsp_org2traces will be *mouse1_io1_traces.mat*
 - For your convenience, all functions work with MATLAB's tab autocompletion.
-- The analysis package is open software in accordance with the GNU General Public License version 3.0.
+- The analysis package is open software in accordance with the GNU General Public License v3.0.
 
-#### Requirements
+### Requirements
 
 - Hardware: This package can run on any computer capable of running MATLAB 2019a.
 - Software: This package requires MATLAB© 2019a or higher with the following toolboxes:
@@ -59,6 +69,6 @@ In 'fast mode', only the highest intensity per channel will be presented by defa
     - Signal Processing Toolbox™
     - Statistics and Machine Learning Toolbox™
 
-#### Citation
+### Citation
 The analysis package was written by Lior de Marcas and Leore R. Heim.<br>
 Cite as: Heim et al., STAR protocol.

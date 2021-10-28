@@ -73,14 +73,14 @@ marking_win     = fepsp_markings("traces", traces, "fs", fs,...
                 "dt", 2, "max_jitter", 0.5, "fast_mark", true);
 
 % step 2.5      wait until you finished marking (closed the window) & 
-%               load the markings that were saved in step 2
+%               load the markings and updated traces
 waitfor(marking_win)
 load([basename, '_fepsp_markings.mat'], "markings")
 load([basename, '_fepsp_traces.mat'], "traces")
 
 % step 3        analyzes traces according to the manual markings
 results         = fepsp_analyse("traces", traces, "fs", fs,...
-                "protocol_id", protocol_id, "markings",markings,...
+                "protocol_id", protocol_id, "markings", markings,...
                 "base_path", basepath, "save_var", true, "slope_area", [0.2 0.9]);
 
 % step 4        dispalys the results
