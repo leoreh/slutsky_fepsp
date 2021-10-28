@@ -14,7 +14,7 @@ Here you will find resources designed to assist in recordings of *in vivo* field
 
 ### Pipeline
 
-<img src="Analysis/Graphics/FlowChart.png" width=750 ><br>
+<img src="Analysis/Graphics/flowChart.png" width=750 ><br>
 
 #### Before you begin
 Prepare the raw data including times of stimulus onset.<br>
