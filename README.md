@@ -6,7 +6,7 @@ Here you will find resources for recording *in vivo* field excitatory post synap
 
 - Stimulation protocols written for winWCP and Arduino
 - A spreadsheet for easy localization of implant coordinates during surgery
-- CAD files for printing and/or machining components designed for custom head fixation apparatus
+- CAD files for printing and/or machining components designed for a custom head fixation apparatus
 
 
 
@@ -27,7 +27,7 @@ Prepare the raw data including times of stimulus onset.<br>
 #### fepsp_org2traces
 Organizes raw data according to stimulus protocol, number of channels, number of intensities, etc...<br>
 Allows removing the trend (mean and slope) from individual traces.<br>
-Outputs traces in a cell array. The format of traces if crucial for the rest of the pipeline.
+Outputs traces in a cell array. The format of traces is crucial for the rest of the pipeline.
 
 <img src="Analysis/Graphics/traces.png" width=750 ><br>
 
@@ -38,17 +38,17 @@ The number of marker pairs is determined by the number of stimuli in a trace.<br
 Compensates for small inaccuracies in the manual markings by jittering in time the markers closer to the peak.<br>
 Allows removal or inversion of individual traces. <br>
 Provides easy navigation between all channels and intensities.<br>
-In 'fast mode', only the highest intensity per channel will be presented by default.<br>
-Saves markings as a struct with four cells: start and peak for individual and average traces.<br>
+In 'fast mode', only the highest intensity per channel will be automatically presented.<br>
+Saves markings as a struct with four cells: start and peak for individual and averaged traces.<br>
 Updates traces according to the changes done in the GUI.<br>
 
 <img src="Analysis/Graphics/markings.png" width=750 ><br>
 
 
 #### fepsp_analyse
-Calculate slope and amplitude for the individual and average traces.<br>
+Calculates slope and amplitude for the individual and averaged traces.<br>
 Allows user to determine the area for slope calculation.<br>
-Outputs results as struct.
+Outputs results as a struct.
 
 #### fepsp_summaryPlot
 Summary plot of the results.<br>
