@@ -26,8 +26,8 @@ function protocol_info = fepsp_getProtocol(varargin)
 %   stim_times  - numeric column vector. Start time of each stimuli [ms].
 %   stim_length - numeric scalar. How long stimuli are [us].
 %   rec_length  - numeric scalar. How long each trace recording is [ms].
-%   pstim_win   - numeric mat, stimulus number (row) x start / end of window
-%                 (column). Area after each stimulation, from
+%   pstim_win   - numeric n x 2 mat of stimulus number (row) x [start, end]
+% %               of window (column). Area after each stimulation, from
 %                 current stimulus end to the start of the next one, or 30
 %                 millisecond after the last stimulation.
 %
@@ -221,8 +221,9 @@ if ~isempty(fs)
     protocol_info.baseline = 1:round((protocol_info.stim_times(1)-dt)* fs / 1000);
     
     % create time stamps
-    protocol_info.Tstamps = -protocol_info.stim_times(1):(1/fs)*1000:(protocol_info.rec_length-protocol_info.stim_times(1));
-    protocol_info.Tstamps = protocol_info.Tstamps';
+    protocol_info.Tstamps = -protocol_info.stim_times(1) :...
+        (1 / fs) * 1000 : (protocol_info.rec_length - protocol_info.stim_times(1));
+    protocol_info.Tstamps = protocol_info.Tstamps(1 : end - 1)';
 end
 
 end
