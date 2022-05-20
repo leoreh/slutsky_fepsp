@@ -148,7 +148,7 @@ switch protocol_id
         if ~isempty(protocol_info.protocol_id)
             % prevent naming protocols "custom" or "display" - they won't load
             if ismember(protocol_info.protocol_id,{'custom','display'})
-                error('Protocol ID can''t be reserved words "custom" or "display"')
+                error('Protocol ID cannot be reserved words "custom" or "display"')
             end
             
             % warn about overwriting existing protocols
@@ -222,7 +222,7 @@ if ~isempty(fs)
     
     % create time stamps
     protocol_info.Tstamps = -protocol_info.stim_times(1) :...
-        (1 / fs) * 1000 : (protocol_info.rec_length - protocol_info.stim_times(1));
+        (1 / fs) * 1000 : (protocol_info.rec_length - protocol_info.stim_times(1)) + 1;
     protocol_info.Tstamps = protocol_info.Tstamps(1 : end - 1)';
 end
 

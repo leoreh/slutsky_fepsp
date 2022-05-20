@@ -105,6 +105,11 @@ trace_temp = floor(protocol_info.Tstamps * fs / 1000)';
 % snip traces from data by creating a mat of indices 
 traces_matIdx = trace_temp' + [stim_locs{:}];
 
+% lazy fix for this terrible indexing
+if traces_matIdx(1, 1) == 0
+    traces_matIdx(:, 1) = traces_matIdx(:, 1) + 1;
+end
+
 try
     traces_mat = data_in(traces_matIdx, :);
 

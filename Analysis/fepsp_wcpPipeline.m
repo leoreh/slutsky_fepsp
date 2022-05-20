@@ -113,7 +113,7 @@ for ifile = 1 : nfiles
             cntdata = [cntdata; tmpdata];
             filelength(ifile) = length(tmpdata);            
 
-        case {'io', 'stp'}
+        case {'io', 'stp', 'stp5'}
             % cat data and create stim indices
             cntdata = [cntdata; lfp.data(:)];
             stim_locs{ifile} = stim_start + [stim_times(1) * fs :...
@@ -171,6 +171,15 @@ lfp.intens = intens;
 recdir = fullfile(basepath, recname);
 mkdir(recdir);
 save(fullfile(recdir, [recname, '.lfp.mat']), 'lfp')
+
+% debugging for cntdata
+dbflag = false;
+if dbflag
+    fh = figure;
+    plot([1 : length(cntdata)] / fsRatio, cntdata)
+    hold on
+    plot([[stim_locs{:}]; [stim_locs{:}]], ylim, '--k')
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % continue processing
