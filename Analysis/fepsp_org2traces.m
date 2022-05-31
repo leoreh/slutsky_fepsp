@@ -103,7 +103,7 @@ protocol_info = fepsp_getProtocol("protocol_id", protocol_id, "fs", fs);
 trace_temp = floor(protocol_info.Tstamps * fs / 1000)';
 
 % snip traces from data by creating a mat of indices 
-traces_matIdx = trace_temp' + [stim_locs{:}];
+traces_matIdx = round(trace_temp' + [stim_locs{:}]);
 
 % lazy fix for this terrible indexing
 if traces_matIdx(1, 1) == 0
@@ -162,7 +162,7 @@ if rmv_trend
     % build regressor to find the trend of a trace using the first and last 5
     % ms. This is to exclude the evoked response and stimulus artifact from the
     % linear fit. Based on matrix form of polynomial regression.
-    lip = 5 * fs / 1000;
+    lip = ceil(5 * fs / 1000);
     reg_len = 2 * lip;
     trace_len = length(trace_temp);
     
@@ -177,10 +177,16 @@ if rmv_trend
         for iCh = 1 : nCh
             trend_coeff = (r \ q' * traces{iCh, iIntens}(use_idx, :));
             trend{iCh, iIntens} = w_full * trend_coeff;
-            x{iCh, iIntens} = traces{iCh, iIntens} - trend{iCh, iIntens};
+            traces{iCh, iIntens} = traces{iCh, iIntens} - trend{iCh, iIntens};
         end
     end
 end
+
+% % remove baseline mean
+% for iIntens = 1 : nIntens
+%     for iCh = 1 : nCh
+%     end
+% end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % save

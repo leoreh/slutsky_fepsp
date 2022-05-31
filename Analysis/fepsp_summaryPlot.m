@@ -35,6 +35,7 @@ function [sumPlot] = fepsp_summaryPlot(varargin)
 %                 Used to omit stimulus artifact from analysis. 
 %                 See "fepsp_getProtocol.m" for more info.
 %                 Default: 2.
+%   saveFig     - logical. save figure in basepath {true}
 %
 % OUTPUT:
 %   sumPlot     - figure handles array. Handles to the summary figures, one
@@ -65,6 +66,7 @@ p.addParameter('intens',        [], @(x) (isnumeric(x) && isvector(x)) || isempt
 p.addParameter('traces_xlim',   [], @(x) (isnumeric(x) && numel(x)==2) || isempty(x))
 p.addParameter('traces_ylim',   [], @(x) (isnumeric(x) && numel(x)==2) || isempty(x))
 p.addParameter('dt',            2,  @(x) validateattributes(x,{'numeric'},{'scalar','nonnegative'}))
+p.addParameter('saveFig',       true, @islogical)
 
 parse(p, varargin{:})
 
@@ -77,6 +79,7 @@ intens          = p.Results.intens;
 traces_xlim     = sort(p.Results.traces_xlim);
 traces_ylim     = sort(p.Results.traces_ylim);
 dt              = p.Results.dt;
+saveFig         = p.Results.saveFig;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % prep
@@ -281,6 +284,17 @@ for iChan = size(traces, 1) : -1 : 1
         end
         loop_subplot = fepsp_graphics(loop_subplot);          % set graphics
     end
+end
+
+% save
+if saveFig
+   
+    basepath = pwd;
+    [~, basename] = fileparts(basepath);
+    figpath = fullfile(basepath, 'graphics', 'fepsp');
+    mkdir(figpath)
+    figname = fullfile(figpath, sprintf('%s_fepsp_results', basename));
+    export_fig(figname, '-tif', '-transparent', '-r300')
 end
 
 end

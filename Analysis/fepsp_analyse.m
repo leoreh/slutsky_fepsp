@@ -232,6 +232,10 @@ results.all_traces = struct('Amp',{Amp},'Slope', {Slope},'slope_err',{slope_err}
 results.avg_traces = struct('Amp',{Amp_avg},'Slope',{slope_avg},'slope_err',{slope_err_avg},'slope_win',{slope_win_avg});
 results.slope_area = slope_area;
 
+% info
+results.info.runtime = datetime(now, 'ConvertFrom', 'datenum');
+results.info.protocol_id = protocol_id;
+
 % save
 if save_var
     % create file name from base_folder
