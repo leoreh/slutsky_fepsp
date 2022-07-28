@@ -109,6 +109,7 @@ traces_matIdx = round(trace_temp' + [stim_locs{:}]);
 if traces_matIdx(1, 1) == 0
     traces_matIdx(:, 1) = traces_matIdx(:, 1) + 1;
 end
+traces_matIdx(traces_matIdx > numel(data_in)) = numel(data_in);
 
 try
     traces_mat = data_in(traces_matIdx, :);

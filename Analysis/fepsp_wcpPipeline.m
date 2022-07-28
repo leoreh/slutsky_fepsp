@@ -103,7 +103,7 @@ for ifile = 1 : nfiles
         case 'freerun'
             % remove incomplete data from last tract
             tmpdata = lfp.data(:);
-            rmidx = find(movmax(diff(tmpdata), [0, 100]) == 0);
+            rmidx = find(movmax(diff(tmpdata), [0, 500]) == 0);
             if max(diff(rmidx)) > 1 
                 warning('check')
             end
@@ -191,40 +191,46 @@ cd(basepath)
 fs = lfp.fs;
 
 % fepsp --------------------------------------------------------------------
+if ~strcmp(fepsp_protocol, 'freerun')
 
-% organize in fepsp cell format
-[traces] = fepsp_org2traces('data_in', lfp.data',...
-    'basepath', basepath, 'fs', fs, 'protocol_id', fepsp_protocol,...
-    'stim_locs', stim_locs);
+    % organize in fepsp cell format
+    [traces] = fepsp_org2traces('data_in', lfp.data',...
+        'basepath', basepath, 'fs', fs, 'protocol_id', fepsp_protocol,...
+        'stim_locs', stim_locs);
 
-% mark traces via gui
-marking_win = fepsp_markings("traces", traces, "fs", fs,...
-    "protocol_id", fepsp_protocol, "base_path", basepath,...
-    "intens", intens, "traces_Xlimit", [], "traces_Ylimit", [],...
-    "dt", 2, "max_jitter", 0.5, "fast_mark", false);
+    % mark traces via gui
+    marking_win = fepsp_markings("traces", traces, "fs", fs,...
+        "protocol_id", fepsp_protocol, "base_path", basepath,...
+        "intens", intens, "traces_Xlimit", [], "traces_Ylimit", [],...
+        "dt", 2, "max_jitter", 0.5, "fast_mark", false);
 
-% load markings and updated traces
-waitfor(marking_win)
-load([basename, '_fepsp_markings.mat'], "markings")
-load([basename, '_fepsp_traces.mat'], "traces")
+    % load markings and updated traces
+    waitfor(marking_win)
+    load([basename, '_fepsp_markings.mat'], "markings")
+    load([basename, '_fepsp_traces.mat'], "traces")
 
-% analyze traces according to the manual markings
-results = fepsp_analyse("traces", traces, "fs", fs,...
-    "protocol_id", fepsp_protocol, "markings", markings,...
-    "base_path", basepath, "save_var", true, "slope_area", [0.2 0.9]);
+    % analyze traces according to the manual markings
+    results = fepsp_analyse("traces", traces, "fs", fs,...
+        "protocol_id", fepsp_protocol, "markings", markings,...
+        "base_path", basepath, "save_var", true, "slope_area", [0.2 0.9]);
 
-% step 4        dispalys the results
-analysed_fepsp = fepsp_summaryPlot("traces", traces, "fs", fs,...
-    "protocol_id", fepsp_protocol, "markings", markings, "results", results,...
-    "base_path", basepath, "intens", intens);
+    % step 4        dispalys the results
+    analysed_fepsp = fepsp_summaryPlot("traces", traces, "fs", fs,...
+        "protocol_id", fepsp_protocol, "markings", markings, "results", results,...
+        "base_path", basepath, "intens", intens);
 
 
-% freerun -----------------------------------------------------------------
+    % freerun -----------------------------------------------------------------
+else
 
-if strcmp(fepsp_protocol, 'freerun')
     % spectrogram
-    [s, tstamps, freq] = specBand('basepath', basepath, 'sig', lfp.data,...
-        'fs', lfp.fs, 'graphics', true, 'logfreq', true);
+    spec = calc_spec('sig', lfp.data, 'fs', lfp.fs, 'graphics', false, 'saveVar', true,...
+        'padfft', -1, 'winstep', 10, 'logfreq', true, 'ftarget', logspace(log10(1.5), 2, 200),...
+        'ch', [{1}], 'force', true);
+
+    plot_spec(spec, 'ch', 1, 'logfreq', true, 'saveFig', false,...
+        'axh', [])
+
     yLimit = ylim;
     hold on
     tidx = [cumsum(lfp.filelength) / 60 / 60]';
