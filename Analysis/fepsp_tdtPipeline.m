@@ -120,7 +120,7 @@ fsRat = fs / fsStim;
 stimIdx = round(stimIdx * fsRat);
 
 % organize stims according to intensity
-nstims = 42;
+nstims = 45;
 nintens = length(intens);
 stimLocs = num2cell(reshape(1 : nstims, nstims / nintens, nintens), 1);
 for iintens = 1 : nintens
