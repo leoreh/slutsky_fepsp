@@ -219,6 +219,12 @@ if ~strcmp(fepsp_protocol, 'freerun')
         "protocol_id", fepsp_protocol, "markings", markings, "results", results,...
         "base_path", basepath, "intens", intens);
 
+    % add intens to results.info
+    resultsfile = [basename, '_fepsp_results.mat'];
+    load(resultsfile, 'results')
+    results.info.intens = intens;
+    results.info.wcpfiles = wcpfiles;
+    save(resultsfile, 'results')
 
     % freerun -----------------------------------------------------------------
 else
