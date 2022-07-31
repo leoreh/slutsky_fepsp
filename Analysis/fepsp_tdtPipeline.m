@@ -16,7 +16,7 @@ function fepsp_tdtPipeline(varargin)
 %   mapch           numeric. see tdt2dat
 %   rmvch           numeric. see tdt2dat
 %   ch              numeric. index to channel in data stream with the fepsp
-%                   signal
+%                   signal. before rmv and map channels
 %   store           char. see tdt2dat {'Raw1'}
 %   protocol_id  char. can be 'freerun', 'io', or 'stp'
 %   recsuffix       char. suffix to add to basename 
@@ -70,15 +70,15 @@ end
 
 cd(basepath)
 
-% load stim
-[datInfo, Stim] = tdt2dat('basepath', basepath, 'store', 'Stim', 'blocks',  blocks,...
-    'chunksize', 300, 'mapch', 1, 'rmvch', [], 'clip', {});
-fsStim = datInfo.fs;
+% get fs from block header
+blockpath = fullfile(basepath, ['block-', num2str(blocks(1))]);
+blockHead = TDTbin2mat(blockpath, 'HEADERS', 1);
+fsStim = blockHead.stores.Stim.fs;
+fs = blockHead.stores.(store).fs;
 
 % create dat
-datInfo = tdt2dat('basepath', basepath, 'store', store, 'blocks',  blocks,...
-    'chunksize', 300, 'mapch', mapch', 'rmvch', rmvch, 'clip', {});
-fs = datInfo.fs;
+% datInfo = tdt2dat('basepath', basepath, 'store', store, 'blocks',  blocks,...
+%     'chunksize', 300, 'mapch', mapch', 'rmvch', rmvch, 'clip', {});
 
 % load dat and stim, and clip if necessary
 blockfiles = dir('block*');
@@ -107,6 +107,10 @@ for iblock = 1 : length(blocks)
     sig = [sig, dat];
 end
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% organize stim indices
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 % convert stim binary to indices
 stimIdx = find(stim);
 stimIdx = [stimIdx(1), stimIdx(find(diff(stimIdx) > fsStim) + 1)];
@@ -115,14 +119,22 @@ stimIdx = [stimIdx(1), stimIdx(find(diff(stimIdx) > fsStim) + 1)];
 fsRat = fs / fsStim;
 stimIdx = round(stimIdx * fsRat);
 
-% organize in cell according to blocks
-csamps = round(cumsum(datInfo.nsamps) * fsRat);
-csamps = [1, csamps];
-stimLocs = cell(length(blocks), 1);
-for iblock = 1 : length(blocks)
-    blockIdx = stimIdx > csamps(iblock) & stimIdx < csamps(iblock + 1);
-    stimLocs{iblock} = stimIdx(blockIdx);
+% organize stims according to intensity
+nstims = 42;
+nintens = length(intens);
+stimLocs = num2cell(reshape(1 : nstims, nstims / nintens, nintens), 1);
+for iintens = 1 : nintens
+    stimLocs{iintens} = stimIdx(stimLocs{iintens});
 end
+
+% organize in cell according to blocks
+% csamps = round(cumsum(datInfo.nsamps) * fsRat);
+% csamps = [1, csamps];
+% stimLocs = cell(length(blocks), 1);
+% for iblock = 1 : length(blocks)
+%     blockIdx = stimIdx > csamps(iblock) & stimIdx < csamps(iblock + 1);
+%     stimLocs{iblock} = stimIdx(blockIdx);
+% end
 
 % debugging ---------------------------------------------------------------
 % fh = figure;
@@ -130,40 +142,40 @@ end
 % hold on
 % plot([stimIdx; stimIdx] / fs, ylim, '--k')
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % organize session folder
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % move to folder
 [~, basename] = fileparts(basepath);
-fnames = dir(['*' basename '*']);
-recname = [basename, '_', recsuffix];
-newpath = fullfile(basepath, recname);
-mkdir(newpath)
-for ifile = 1 : length(fnames)
-    if ~fnames(ifile).isdir
-        newname = strrep(fnames(ifile).name, basename, recname);
-        newfile = fullfile(newpath, newname);
-        movefile(fnames(ifile).name, newfile, 'f')
-    end
-end
+% fnames = dir(['*' basename '*']);
+% recname = [basename, '_', recsuffix];
+% newpath = fullfile(basepath, recname);
+% mkdir(newpath)
+% for ifile = 1 : length(fnames)
+%     if ~fnames(ifile).isdir
+%         newname = strrep(fnames(ifile).name, basename, recname);
+%         newfile = fullfile(newpath, newname);
+%         movefile(fnames(ifile).name, newfile, 'f')
+%     end
+% end
+newpath = basepath;
+recname = basename;
 
 % get xml from mousepath
-mousepath = fileparts(basepath);
-[~, mousename] = fileparts(mousepath);
-xmlfile = dir(fullfile(mousepath, '*xml'));
-newname = strrep(xmlfile.name, mousename, recname);
-newfile = fullfile(newpath, newname);
-copyfile(fullfile(mousepath, xmlfile.name), newfile)
+% mousepath = fileparts(basepath);
+% [~, mousename] = fileparts(mousepath);
+% xmlfile = dir(fullfile(mousepath, '*xml'));
+% newname = strrep(xmlfile.name, mousename, recname);
+% newfile = fullfile(newpath, newname);
+% copyfile(fullfile(mousepath, xmlfile.name), newfile)
 
-% starting working on session
-cd(newpath)
-basepath = pwd;
-basename = recname;
+% start working on session
+% cd(newpath)
+% basepath = pwd;
+% basename = recname;
 session = CE_sessionTemplate(pwd, 'viaGUI', false,...
     'forceDef', true, 'forceL', true, 'saveVar', true);      
-fs = session.extracellular.sr;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % fepsp pipeline
@@ -196,12 +208,26 @@ analysed_fepsp  = fepsp_summaryPlot("traces", traces, "fs", fs,...
                 "protocol_id", protocol_id, "markings", markings, "results", results,...
                 "base_path", basepath, "intens", intens);
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % add info to results
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% get stim times in relation to entire recording
+load([basename, '.', store, '.datInfo.mat'])
+if blocks > 1
+    addsamps = cumsum(datInfo.nsamps(1 : blocks - 1));
+else
+    addsamps = 0;
+end
+stimIdx = (stimIdx + addsamps(end)) / fs;
+
 resultsfile = [basename, '_fepsp_results.mat'];
 load(resultsfile, 'results')
 results.info.tdt.ch = ch;
 results.info.tdt.difflen = difflen;
 results.info.intens = intens;
+results.info.stimLocs = stimLocs;
+results.info.stimIdx = stimIdx;
 save(resultsfile, 'results')
 
 end 
