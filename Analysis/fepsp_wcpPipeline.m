@@ -34,7 +34,7 @@ addOptional(p, 'basepath', pwd);
 addOptional(p, 'wcpfiles', []);
 addOptional(p, 'fepsp_protocol', 'io', @ischar);
 addOptional(p, 'recname', '', @ischar);
-addOptional(p, 'fsOut', 1250, @isnumeric);
+addOptional(p, 'fsOut', [], @isnumeric);
 addOptional(p, 'intens', [], @isnumeric);
 
 parse(p, varargin{:})
@@ -124,7 +124,7 @@ for ifile = 1 : nfiles
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% filter and downsample
+% filter and downsample (not in use)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % filter params
@@ -145,7 +145,8 @@ if mod(ntbuff, fsRatio) ~= 0
 end
 
 % do the filtering
-lfp.data = [iosr.dsp.sincFilter(cntdata, filtRatio)]';
+% lfp.data = [iosr.dsp.sincFilter(cntdata, filtRatio)]';
+lfp.data = cntdata';
 
 % downsample
 if fsRatio ~= 1
