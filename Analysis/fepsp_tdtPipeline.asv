@@ -111,17 +111,16 @@ end
 % organize stim indices
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% convert stim binary to indices. assumes, if there is faciliation, the
-% stim frequency is greater than 1 Hz
+% convert stim binary to indices
 stimIdx = find(stim);
-stimIdx = [stimIdx(1), stimIdx(find(diff(stimIdx) > fsStim) + 1)]; 
+stimIdx = [stimIdx(1), stimIdx(find(diff(stimIdx) > fsStim) + 1)];
 
 % downsample 
 fsRat = fs / fsStim;
 stimIdx = round(stimIdx * fsRat);
 
 % organize stims according to intensity
-nstims = length(stimIdx);
+nstims = 24;
 nintens = length(intens);
 stimLocs = num2cell(reshape(1 : nstims, nstims / nintens, nintens), 1);
 for iintens = 1 : nintens
