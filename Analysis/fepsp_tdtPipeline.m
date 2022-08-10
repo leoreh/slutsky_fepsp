@@ -124,6 +124,9 @@ stimIdx = round(stimIdx * fsRat);
 nstims = length(stimIdx);
 nintens = length(intens);
 stimLocs = num2cell(reshape(1 : nstims, nstims / nintens, nintens), 1);
+% stimLocs{1} = 1 : 20;
+% stimLocs{2} = 21 : 40;
+% stimLocs{3} = 41 : 59;
 for iintens = 1 : nintens
     stimLocs{iintens} = stimIdx(stimLocs{iintens});
 end
