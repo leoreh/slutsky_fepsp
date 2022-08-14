@@ -178,8 +178,8 @@ recname = basename;
 % cd(newpath)
 % basepath = pwd;
 % basename = recname;
-session = CE_sessionTemplate(pwd, 'viaGUI', false,...
-    'forceDef', true, 'forceL', true, 'saveVar', true);      
+% session = CE_sessionTemplate(pwd, 'viaGUI', false,...
+%     'forceDef', true, 'forceL', true, 'saveVar', true);      
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % fepsp pipeline
